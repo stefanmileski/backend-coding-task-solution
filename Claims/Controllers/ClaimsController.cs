@@ -1,4 +1,3 @@
-using Claims.Auditing;
 using Claims.Domain;
 using Claims.Services.Claim.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +9,9 @@ namespace Claims.API.Controllers
     public class ClaimsController(IClaimsService _claimsService) : ControllerBase
     {
         [HttpGet]
-        public async Task<IEnumerable<Claim>> GetAsync()
+        public async Task<ActionResult<IEnumerable<Claim>>> GetAsync()
         {
-            return await _claimsService.GetClaimsAsync();
+            return Ok(await _claimsService.GetClaimsAsync());
         }
 
         [HttpPost]
@@ -30,7 +29,7 @@ namespace Claims.API.Controllers
         }
 
         [HttpGet("{uid}")]
-        public async Task<Claim?> GetAsync(Guid uid)
+        public async Task<ActionResult<Claim?>> GetAsync(Guid uid)
         {
             return await _claimsService.GetClaimAsync(uid);
         }

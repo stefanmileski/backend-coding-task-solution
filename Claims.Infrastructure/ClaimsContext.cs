@@ -31,7 +31,7 @@ namespace Claims.Infrastructure
                 .SingleOrDefaultAsync();
         }
 
-        public async Task AddItemAsync(Claim claim)
+        public async Task AddClaimAsync(Claim claim)
         {
             Claims.Add(claim);
             await SaveChangesAsync();
@@ -39,7 +39,7 @@ namespace Claims.Infrastructure
             _auditer.AuditClaim(claim.Uid.ToString(), "POST");
         }
 
-        public async Task DeleteItemAsync(Guid uid)
+        public async Task DeleteClaimAsync(Guid uid)
         {
             Claim? claim = await GetClaimAsync(uid);
             if (claim is not null)
@@ -48,6 +48,38 @@ namespace Claims.Infrastructure
                 await SaveChangesAsync();
 
                 _auditer.AuditClaim(uid.ToString(), "DELETE");
+            }
+        }
+
+        public async Task<IEnumerable<Cover>> GetCoversAsync()
+        {
+            return await Covers.ToListAsync();
+        }
+
+        public async Task<Cover?> GetCoverAsync(Guid uid)
+        {
+            return await Covers
+                .Where(cover => cover.Uid == uid)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task AddCoverAsync(Cover cover)
+        {
+            Covers.Add(cover);
+            await SaveChangesAsync();
+
+            _auditer.AuditCover(cover.Uid.ToString(), "POST");
+        }
+
+        public async Task DeleteCoverAsync(Guid uid)
+        {
+            Cover? cover = await GetCoverAsync(uid);
+            if (cover is not null)
+            {
+                Covers.Remove(cover);
+                await SaveChangesAsync();
+
+                _auditer.AuditCover(uid.ToString(), "DELETE");
             }
         }
     }
