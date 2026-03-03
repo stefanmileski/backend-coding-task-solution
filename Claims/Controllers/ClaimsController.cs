@@ -1,4 +1,5 @@
-using Claims.Domain;
+using Claims.Contracts.Requests;
+using Claims.Contracts.Responses;
 using Claims.Services.Claim.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,29 +10,48 @@ namespace Claims.API.Controllers
     public class ClaimsController(IClaimsService _claimsService) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Claim>>> GetAsync()
+        public async Task<ActionResult<IEnumerable<GetClaimResponse>>> GetAsync()
         {
             return Ok(await _claimsService.GetClaimsAsync());
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateAsync(Claim claim)
+        public async Task<ActionResult> CreateAsync(CreateClaimRequest request)
         {
-            await _claimsService.CreateClaimAsync(claim);
-            
-            return Ok(claim);
+            string claimId = await _claimsService.CreateClaimAsync(request);
+
+            if (!string.IsNullOrEmpty(claimId))
+            {
+                return Ok(claimId);
+            }
+
+            return BadRequest("Failed to create claim.");
         }
 
         [HttpDelete("{id}")]
-        public async Task DeleteAsync(string id)
+        public async Task<ActionResult> DeleteAsync(string id)
         {
-            await _claimsService.DeleteClaimAsync(id);
+            bool isDeleted = await _claimsService.DeleteClaimAsync(id);
+
+            if (isDeleted)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Claim?>> GetAsync(string id)
+        public async Task<ActionResult<GetClaimResponse?>> GetAsync(string id)
         {
-            return await _claimsService.GetClaimAsync(id);
+            GetClaimResponse? claim = await _claimsService.GetClaimAsync(id);
+
+            if (claim != null)
+            {
+                return Ok(claim);
+            }
+
+            return NotFound();
         }
     }
 }

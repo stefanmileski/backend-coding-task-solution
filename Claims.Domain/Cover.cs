@@ -2,23 +2,23 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Claims.Domain
 {
-    public class Cover
+    public class Cover(string id, DateTime startDate, DateTime endDate, CoverType type, decimal premium)
     {
         [BsonId]
-        public string Id { get; set; }
+        public string Id { get; set; } = id;
 
         [BsonElement("startDate")]
         [BsonDateTimeOptions(DateOnly = true)]
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; } = startDate;
 
         [BsonElement("endDate")]
         [BsonDateTimeOptions(DateOnly = true)]
-        public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; set; } = endDate;
 
         [BsonElement("claimType")]
-        public CoverType Type { get; set; }
+        public CoverType Type { get; set; } = type;
 
         [BsonElement("premium")]
-        public decimal Premium { get; set; }
+        public decimal Premium { get; set; } = premium;
     }
 }

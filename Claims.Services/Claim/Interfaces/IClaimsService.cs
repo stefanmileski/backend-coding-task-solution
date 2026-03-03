@@ -1,13 +1,35 @@
-﻿namespace Claims.Services.Claim.Interfaces
+﻿using Claims.Contracts.Requests;
+using Claims.Contracts.Responses;
+
+namespace Claims.Services.Claim.Interfaces
 {
     public interface IClaimsService
     {
-        Task<IEnumerable<Domain.Claim>> GetClaimsAsync();
+        /// <summary>
+        /// Gets all claims.
+        /// </summary>
+        /// <returns>All claims, or an empty list.</returns>
+        Task<IEnumerable<GetClaimResponse>> GetClaimsAsync();
 
-        Task CreateClaimAsync(Domain.Claim claim);
+        /// <summary>
+        /// Creates a new claim.
+        /// </summary>
+        /// <param name="request">The parameters for the creation of the claim.</param>
+        /// <returns>The id of the newly created claim, or null.</returns>
+        Task<string> CreateClaimAsync(CreateClaimRequest request);
 
-        Task DeleteClaimAsync(string id);
+        /// <summary>
+        /// Deletes a claim by id.
+        /// </summary>
+        /// <param name="id">The id of the claim to delete.</param>
+        /// <returns>True if the deletion is successful, otherwise false.</returns>
+        Task<bool> DeleteClaimAsync(string id);
 
-        Task<Domain.Claim?> GetClaimAsync(string id);
+        /// <summary>
+        /// Gets a claim by id.
+        /// </summary>
+        /// <param name="id">The id of the claim to get.</param>
+        /// <returns>The claim with the given id, or null.</returns>
+        Task<GetClaimResponse?> GetClaimAsync(string id);
     }
 }

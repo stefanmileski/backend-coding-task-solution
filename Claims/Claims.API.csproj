@@ -20,8 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Claims.Domain\Claims.Domain.csproj" />
-    <ProjectReference Include="..\Claims.Infrastructure\Claims.Infrastructure.csproj" />
+    <ProjectReference Include="..\Claims.Contracts\Claims.Contracts.csproj" />
     <ProjectReference Include="..\Claims.Services\Claims.Services.csproj" />
   </ItemGroup>
 

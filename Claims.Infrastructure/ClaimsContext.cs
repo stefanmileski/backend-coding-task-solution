@@ -8,10 +8,6 @@ namespace Claims.Infrastructure
     public class ClaimsContext(DbContextOptions options, AuditContext auditContext) : DbContext(options)
     {
         private readonly Auditer _auditer = new(auditContext);
-        private const string DELETE_METHOD = "DELETE";
-        private const string POST_METHOD = "POST";
-        private const string CLAIMS_COLLECTION_NAME = "claims";
-        private const string COVERS_COLLECTION_NAME = "covers";
 
         private DbSet<Claim> Claims { get; init; }
         public DbSet<Cover> Covers { get; init; }
@@ -19,8 +15,8 @@ namespace Claims.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Claim>().ToCollection(CLAIMS_COLLECTION_NAME);
-            modelBuilder.Entity<Cover>().ToCollection(COVERS_COLLECTION_NAME);
+            modelBuilder.Entity<Claim>().ToCollection("claims");
+            modelBuilder.Entity<Cover>().ToCollection("covers");
         }
 
         public async Task<IEnumerable<Claim>> GetClaimsAsync()
@@ -35,15 +31,17 @@ namespace Claims.Infrastructure
                 .SingleOrDefaultAsync();
         }
 
-        public async Task AddClaimAsync(Claim claim)
+        public async Task<string> AddClaimAsync(Claim claim)
         {
             Claims.Add(claim);
             await SaveChangesAsync();
 
-            _auditer.AuditClaim(claim.Id, POST_METHOD);
+            _auditer.AuditClaim(claim.Id, "POST");
+
+            return claim.Id;
         }
 
-        public async Task DeleteClaimAsync(string id)
+        public async Task<bool> DeleteClaimAsync(string id)
         {
             Claim? claim = await GetClaimAsync(id);
             if (claim is not null)
@@ -51,8 +49,12 @@ namespace Claims.Infrastructure
                 Claims.Remove(claim);
                 await SaveChangesAsync();
 
-                _auditer.AuditClaim(id, DELETE_METHOD);
+                _auditer.AuditClaim(id, "DELETE");
+
+                return true;
             }
+
+            return false;
         }
 
         public async Task<IEnumerable<Cover>> GetCoversAsync()
@@ -67,15 +69,17 @@ namespace Claims.Infrastructure
                 .SingleOrDefaultAsync();
         }
 
-        public async Task AddCoverAsync(Cover cover)
+        public async Task<string> AddCoverAsync(Cover cover)
         {
             Covers.Add(cover);
             await SaveChangesAsync();
 
-            _auditer.AuditCover(cover.Id, POST_METHOD);
+            _auditer.AuditCover(cover.Id, "POST");
+
+            return cover.Id;
         }
 
-        public async Task DeleteCoverAsync(string id)
+        public async Task<bool> DeleteCoverAsync(string id)
         {
             Cover? cover = await GetCoverAsync(id);
             if (cover is not null)
@@ -83,8 +87,12 @@ namespace Claims.Infrastructure
                 Covers.Remove(cover);
                 await SaveChangesAsync();
 
-                _auditer.AuditCover(id, DELETE_METHOD);
+                _auditer.AuditCover(id, "DELETE");
+
+                return true;
             }
+
+            return false;
         }
     }
 }

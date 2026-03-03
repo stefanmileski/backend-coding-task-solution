@@ -2,25 +2,25 @@
 
 namespace Claims.Domain
 {
-    public class Claim
+    public class Claim(string id, string coverId, DateTime created, string name, ClaimType type, decimal damageCost)
     {
         [BsonId]
-        public string Id { get; set; }
+        public string Id { get; set; } = id;
 
         [BsonElement("coverId")]
-        public string CoverId { get; set; }
+        public string CoverId { get; set; } = coverId;
 
         [BsonElement("created")]
         [BsonDateTimeOptions(DateOnly = true)]
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = created;
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = name;
 
         [BsonElement("claimType")]
-        public ClaimType Type { get; set; }
+        public ClaimType Type { get; set; } = type;
 
         [BsonElement("damageCost")]
-        public decimal DamageCost { get; set; }
+        public decimal DamageCost { get; set; } = damageCost;
     }
 }

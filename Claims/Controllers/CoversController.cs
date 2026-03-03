@@ -1,6 +1,8 @@
+using Claims.Contracts.Requests;
+using Claims.Contracts.Responses;
 using Claims.Domain;
-using Microsoft.AspNetCore.Mvc;
 using Claims.Services.Cover.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Claims.API.Controllers
 {
@@ -15,28 +17,48 @@ namespace Claims.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cover>>> GetAsync()
+        public async Task<ActionResult<IEnumerable<GetCoverResponse>>> GetAsync()
         {
             return Ok(await _coversService.GetCoversAsync());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cover?>> GetAsync(string id)
+        public async Task<ActionResult<GetCoverResponse?>> GetAsync(string id)
         {
-            return Ok(await _coversService.GetCoverAsync(id));
+            GetCoverResponse? cover = await _coversService.GetCoverAsync(id);
+
+            if (cover != null)
+            {
+                return Ok(cover);
+            }
+
+            return NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateAsync(Cover cover)
+        public async Task<ActionResult> CreateAsync(CreateCoverRequest request)
         {
-            await _coversService.CreateCoverAsync(cover);
-            return Ok(cover);
+            string coverId = await _coversService.CreateCoverAsync(request);
+
+            if (string.IsNullOrEmpty(coverId))
+            {
+                return BadRequest("Failed to create cover.");
+            }
+
+            return Ok(coverId);
         }
 
         [HttpDelete("{id}")]
-        public async Task DeleteAsync(string id)
+        public async Task<ActionResult> DeleteAsync(string id)
         {
-            await _coversService.DeleteCoverAsync(id);
+            bool isDeleted = await _coversService.DeleteCoverAsync(id);
+
+            if (isDeleted)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
     }
 }

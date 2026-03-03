@@ -1,4 +1,6 @@
-﻿using Claims.Domain;
+﻿using Claims.Contracts.Requests;
+using Claims.Contracts.Responses;
+using Claims.Domain;
 using Claims.Infrastructure;
 using Claims.Services.Cover.Interfaces;
 
@@ -6,26 +8,54 @@ namespace Claims.Services.Cover
 {
     public class CoversService(ClaimsContext _claimsContext) : ICoversService
     {
-        async Task ICoversService.CreateCoverAsync(Domain.Cover cover)
+        async Task<string> ICoversService.CreateCoverAsync(CreateCoverRequest request)
         {
-            cover.Id = Guid.NewGuid().ToString();
-            cover.Premium = ComputePremium(cover.StartDate, cover.EndDate, cover.Type);
-            await _claimsContext.AddCoverAsync(cover);
+            Domain.Cover cover = new(
+                id: Guid.NewGuid().ToString(),
+                startDate: request.StartDate,
+                endDate: request.EndDate,
+                type: request.Type,
+                premium: ComputePremium(request.StartDate, request.EndDate, request.Type));
+
+            return await _claimsContext.AddCoverAsync(cover);
         }
 
-        async Task ICoversService.DeleteCoverAsync(string id)
+        async Task<bool> ICoversService.DeleteCoverAsync(string id)
         {
-            await _claimsContext.DeleteCoverAsync(id);
+            return await _claimsContext.DeleteCoverAsync(id);
         }
 
-        async Task<Domain.Cover?> ICoversService.GetCoverAsync(string id)
+        async Task<GetCoverResponse?> ICoversService.GetCoverAsync(string id)
         {
-            return await _claimsContext.GetCoverAsync(id);
+            Domain.Cover? cover = await _claimsContext.GetCoverAsync(id);
+
+            if (cover is null)
+            {
+                return null;
+            }
+
+            return new GetCoverResponse
+            {
+                Id = cover.Id,
+                StartDate = cover.StartDate,
+                EndDate = cover.EndDate,
+                Type = cover.Type,
+                Premium = cover.Premium
+            };
         }
 
-        async Task<IEnumerable<Domain.Cover>> ICoversService.GetCoversAsync()
+        async Task<IEnumerable<GetCoverResponse>> ICoversService.GetCoversAsync()
         {
-            return await _claimsContext.GetCoversAsync();
+            IEnumerable<Domain.Cover> covers = await _claimsContext.GetCoversAsync();
+
+            return covers.Select(cover => new GetCoverResponse
+            {
+                Id = cover.Id,
+                StartDate = cover.StartDate,
+                EndDate = cover.EndDate,
+                Type = cover.Type,
+                Premium = cover.Premium
+            });
         }
 
         public decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
