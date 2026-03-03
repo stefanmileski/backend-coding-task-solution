@@ -1,4 +1,4 @@
-﻿namespace Claims.Domain.Claim
+﻿namespace Claims.Domain
 {
     public enum ClaimType
     {

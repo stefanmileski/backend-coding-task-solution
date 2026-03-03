@@ -1,11 +1,11 @@
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Claims.Domain.Cover
+namespace Claims.Domain
 {
     public class Cover
     {
         [BsonId]
-        public string Id { get; set; }
+        public Guid Uid { get; set; }
 
         [BsonElement("startDate")]
         [BsonDateTimeOptions(DateOnly = true)]

@@ -1,12 +1,14 @@
-﻿using Claims.Domain.Claim;
-using Claims.Domain.Cover;
+﻿using Claims.Auditing;
+using Claims.Domain;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace Claims.Infrastructure
 {
-    public class ClaimsContext(DbContextOptions options) : DbContext(options)
+    public class ClaimsContext(DbContextOptions options, AuditContext auditContext) : DbContext(options)
     {
+        private readonly Auditer _auditer = new(auditContext);
+
         private DbSet<Claim> Claims { get; init; }
         public DbSet<Cover> Covers { get; init; }
 
@@ -22,26 +24,30 @@ namespace Claims.Infrastructure
             return await Claims.ToListAsync();
         }
 
-        public async Task<Claim> GetClaimAsync(string id)
+        public async Task<Claim?> GetClaimAsync(Guid uid)
         {
             return await Claims
-                .Where(claim => claim.Id == id)
+                .Where(claim => claim.Uid == uid)
                 .SingleOrDefaultAsync();
         }
 
-        public async Task AddItemAsync(Claim item)
+        public async Task AddItemAsync(Claim claim)
         {
-            Claims.Add(item);
+            Claims.Add(claim);
             await SaveChangesAsync();
+
+            _auditer.AuditClaim(claim.Uid.ToString(), "POST");
         }
 
-        public async Task DeleteItemAsync(string id)
+        public async Task DeleteItemAsync(Guid uid)
         {
-            var claim = await GetClaimAsync(id);
+            Claim? claim = await GetClaimAsync(uid);
             if (claim is not null)
             {
                 Claims.Remove(claim);
                 await SaveChangesAsync();
+
+                _auditer.AuditClaim(uid.ToString(), "DELETE");
             }
         }
     }

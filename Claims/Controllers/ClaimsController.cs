@@ -1,42 +1,38 @@
 using Claims.Auditing;
-using Claims.Domain.Claim;
+using Claims.Domain;
+using Claims.Services.Claim.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Claims.Controllers
+namespace Claims.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClaimsController(ClaimsContext claimsContext, AuditContext auditContext) : ControllerBase
+    public class ClaimsController(IClaimsService _claimsService) : ControllerBase
     {
-        private readonly ClaimsContext _claimsContext = claimsContext;
-        private readonly Auditer _auditer = new(auditContext);
-
         [HttpGet]
         public async Task<IEnumerable<Claim>> GetAsync()
         {
-            return await _claimsContext.GetClaimsAsync();
+            return await _claimsService.GetClaimsAsync();
         }
 
         [HttpPost]
         public async Task<ActionResult> CreateAsync(Claim claim)
         {
-            claim.Id = Guid.NewGuid().ToString();
-            await _claimsContext.AddItemAsync(claim);
-            _auditer.AuditClaim(claim.Id, "POST");
+            await _claimsService.CreateClaimAsync(claim);
+            
             return Ok(claim);
         }
 
-        [HttpDelete("{id}")]
-        public async Task DeleteAsync(string id)
+        [HttpDelete("{uid}")]
+        public async Task DeleteAsync(Guid uid)
         {
-            _auditer.AuditClaim(id, "DELETE");
-            await _claimsContext.DeleteItemAsync(id);
+            await _claimsService.DeleteClaimAsync(uid);
         }
 
-        [HttpGet("{id}")]
-        public async Task<Claim> GetAsync(string id)
+        [HttpGet("{uid}")]
+        public async Task<Claim?> GetAsync(Guid uid)
         {
-            return await _claimsContext.GetClaimAsync(id);
+            return await _claimsService.GetClaimAsync(uid);
         }
     }
 }

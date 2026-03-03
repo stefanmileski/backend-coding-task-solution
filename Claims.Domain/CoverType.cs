@@ -1,4 +1,4 @@
-﻿namespace Claims.Domain.Cover
+﻿namespace Claims.Domain
 {
     public enum CoverType
     {

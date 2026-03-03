@@ -1,9 +1,9 @@
 using Claims.Auditing;
-using Claims.Domain.Cover;
+using Claims.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Claims.Controllers
+namespace Claims.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
