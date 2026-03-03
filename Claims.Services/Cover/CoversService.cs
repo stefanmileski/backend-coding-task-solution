@@ -8,8 +8,26 @@ namespace Claims.Services.Cover
 {
     public class CoversService(ClaimsContext _claimsContext) : ICoversService
     {
-        async Task<string> ICoversService.CreateCoverAsync(CreateCoverRequest request)
+        async Task<string?> ICoversService.CreateCoverAsync(CreateCoverRequest request)
         {
+            DateTime startDate = request.StartDate.Date;
+            DateTime endDate = request.EndDate.Date;
+
+            if (startDate < DateTime.UtcNow.Date)
+            {
+                return null;
+            }
+
+            if (endDate > startDate.AddYears(1))
+            {
+                return null;
+            }
+
+            if (endDate < startDate)
+            {
+                return null;
+            }
+
             Domain.Cover cover = new(
                 id: Guid.NewGuid().ToString(),
                 startDate: request.StartDate,

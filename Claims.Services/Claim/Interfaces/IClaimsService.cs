@@ -15,8 +15,8 @@ namespace Claims.Services.Claim.Interfaces
         /// Creates a new claim.
         /// </summary>
         /// <param name="request">The parameters for the creation of the claim.</param>
-        /// <returns>The id of the newly created claim, or null.</returns>
-        Task<string> CreateClaimAsync(CreateClaimRequest request);
+        /// <returns>The id of the newly created claim, or null if unsuccessful.</returns>
+        Task<string?> CreateClaimAsync(CreateClaimRequest request);
 
         /// <summary>
         /// Deletes a claim by id.
@@ -29,7 +29,7 @@ namespace Claims.Services.Claim.Interfaces
         /// Gets a claim by id.
         /// </summary>
         /// <param name="id">The id of the claim to get.</param>
-        /// <returns>The claim with the given id, or null.</returns>
+        /// <returns>The claim with the given id, or null if not found.</returns>
         Task<GetClaimResponse?> GetClaimAsync(string id);
     }
 }

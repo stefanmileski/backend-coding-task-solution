@@ -9,19 +9,19 @@ namespace Claims.Controllers
     [Route("[controller]")]
     public class ClaimsController(IClaimsService _claimsService) : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("list")]
         [ProducesResponseType(typeof(IEnumerable<GetClaimResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GetClaimResponse>>> GetClaimsAsync()
         {
             return Ok(await _claimsService.GetClaimsAsync());
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateClaimAsync(CreateClaimRequest request)
         {
-            string claimId = await _claimsService.CreateClaimAsync(request);
+            string? claimId = await _claimsService.CreateClaimAsync(request);
 
             if (string.IsNullOrEmpty(claimId))
             {
@@ -31,7 +31,7 @@ namespace Claims.Controllers
             return Created();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}/delete")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteClaimAsync(string id)
@@ -46,7 +46,7 @@ namespace Claims.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}/details")]
         [ProducesResponseType(typeof(GetClaimResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetClaimResponse>> GetClaimAsync(string id)

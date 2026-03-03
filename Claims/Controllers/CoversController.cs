@@ -17,14 +17,14 @@ namespace Claims.Controllers
             return Ok(_coversService.ComputePremium(startDate, endDate, coverType));
         }
 
-        [HttpGet]
+        [HttpGet("list")]
         [ProducesResponseType(typeof(IEnumerable<GetCoverResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GetCoverResponse>>> GetCoversAsync()
         {
             return Ok(await _coversService.GetCoversAsync());
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}/details")]
         [ProducesResponseType(typeof(GetCoverResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetCoverResponse?>> GetCoverAsync(string id)
@@ -39,12 +39,12 @@ namespace Claims.Controllers
             return Ok(cover);
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateCoverAsync(CreateCoverRequest request)
         {
-            string coverId = await _coversService.CreateCoverAsync(request);
+            string? coverId = await _coversService.CreateCoverAsync(request);
 
             if (string.IsNullOrEmpty(coverId))
             {
@@ -54,7 +54,7 @@ namespace Claims.Controllers
             return Created();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}/delete")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteCoverAsync(string id)

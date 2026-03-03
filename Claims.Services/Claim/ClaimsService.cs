@@ -7,8 +7,21 @@ namespace Claims.Services.Claim
 {
     public class ClaimsService(ClaimsContext _claimsContext) : IClaimsService
     {
-        async Task<string> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
+        async Task<string?> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
         {
+            if (request.DamageCost > 100000)
+            {
+                return null;
+            }
+
+            Domain.Cover? cover = await _claimsContext.GetCoverAsync(request.CoverId);
+
+            if (cover is null
+                || (request.Created < cover.StartDate || request.Created > cover.EndDate))
+            {
+                return null;
+            }
+
             Domain.Claim claim = new(
                 id: Guid.NewGuid().ToString(),
                 coverId: request.CoverId,

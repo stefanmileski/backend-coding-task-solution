@@ -15,8 +15,8 @@ namespace Claims.Services.Cover.Interfaces
         /// Creates a new cover.
         /// </summary>
         /// <param name="request">The parameters for the creation of the cover.</param>
-        /// <returns>The id of the newly created cover, or null.</returns>
-        Task<string> CreateCoverAsync(CreateCoverRequest cover);
+        /// <returns>The id of the newly created cover, or null if unsuccessful.</returns>
+        Task<string?> CreateCoverAsync(CreateCoverRequest cover);
 
         /// <summary>
         /// Deletes a cover by id.
@@ -29,7 +29,7 @@ namespace Claims.Services.Cover.Interfaces
         /// Gets a cover by id.
         /// </summary>
         /// <param name="id">The id of the cover to get.</param>
-        /// <returns>The cover with the given id, or null.</returns>
+        /// <returns>The cover with the given id, or null if not found.</returns>
         Task<GetCoverResponse?> GetCoverAsync(string id);
 
         /// <summary>
