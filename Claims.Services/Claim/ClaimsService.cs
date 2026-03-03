@@ -7,18 +7,18 @@ namespace Claims.Services.Claim
     {
         async Task IClaimsService.CreateClaimAsync(Domain.Claim claim)
         {
-            claim.Uid = Guid.NewGuid();
+            claim.Id = Guid.NewGuid().ToString();
             await _claimsContext.AddClaimAsync(claim);
         }
 
-        async Task IClaimsService.DeleteClaimAsync(Guid uid)
+        async Task IClaimsService.DeleteClaimAsync(string id)
         {
-            await _claimsContext.DeleteClaimAsync(uid);
+            await _claimsContext.DeleteClaimAsync(id);
         }
 
-        async Task<Domain.Claim?> IClaimsService.GetClaimAsync(Guid uid)
+        async Task<Domain.Claim?> IClaimsService.GetClaimAsync(string id)
         {
-            return await _claimsContext.GetClaimAsync(uid);
+            return await _claimsContext.GetClaimAsync(id);
         }
 
         async Task<IEnumerable<Domain.Claim>> IClaimsService.GetClaimsAsync()

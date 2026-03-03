@@ -22,16 +22,16 @@ namespace Claims.API.Controllers
             return Ok(claim);
         }
 
-        [HttpDelete("{uid}")]
-        public async Task DeleteAsync(Guid uid)
+        [HttpDelete("{id}")]
+        public async Task DeleteAsync(string id)
         {
-            await _claimsService.DeleteClaimAsync(uid);
+            await _claimsService.DeleteClaimAsync(id);
         }
 
-        [HttpGet("{uid}")]
-        public async Task<ActionResult<Claim?>> GetAsync(Guid uid)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Claim?>> GetAsync(string id)
         {
-            return await _claimsService.GetClaimAsync(uid);
+            return await _claimsService.GetClaimAsync(id);
         }
     }
 }

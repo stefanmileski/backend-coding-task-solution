@@ -6,8 +6,8 @@
 
         Task CreateClaimAsync(Domain.Claim claim);
 
-        Task DeleteClaimAsync(Guid uid);
+        Task DeleteClaimAsync(string id);
 
-        Task<Domain.Claim?> GetClaimAsync(Guid uid);
+        Task<Domain.Claim?> GetClaimAsync(string id);
     }
 }

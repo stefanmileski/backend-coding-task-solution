@@ -6,9 +6,9 @@
 
         Task CreateCoverAsync(Domain.Cover cover);
 
-        Task DeleteCoverAsync(Guid uid);
+        Task DeleteCoverAsync(string id);
 
-        Task<Domain.Cover?> GetCoverAsync(Guid uid);
+        Task<Domain.Cover?> GetCoverAsync(string id);
 
         decimal ComputePremium(DateTime startDate, DateTime endDate, Domain.CoverType coverType);
     }

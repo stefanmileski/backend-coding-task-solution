@@ -5,7 +5,7 @@ namespace Claims.Domain
     public class Cover
     {
         [BsonId]
-        public Guid Uid { get; set; }
+        public string Id { get; set; }
 
         [BsonElement("startDate")]
         [BsonDateTimeOptions(DateOnly = true)]

@@ -8,19 +8,19 @@ namespace Claims.Services.Cover
     {
         async Task ICoversService.CreateCoverAsync(Domain.Cover cover)
         {
-            cover.Uid = Guid.NewGuid();
+            cover.Id = Guid.NewGuid().ToString();
             cover.Premium = ComputePremium(cover.StartDate, cover.EndDate, cover.Type);
             await _claimsContext.AddCoverAsync(cover);
         }
 
-        async Task ICoversService.DeleteCoverAsync(Guid uid)
+        async Task ICoversService.DeleteCoverAsync(string id)
         {
-            await _claimsContext.DeleteCoverAsync(uid);
+            await _claimsContext.DeleteCoverAsync(id);
         }
 
-        async Task<Domain.Cover?> ICoversService.GetCoverAsync(Guid uid)
+        async Task<Domain.Cover?> ICoversService.GetCoverAsync(string id)
         {
-            return await _claimsContext.GetCoverAsync(uid);
+            return await _claimsContext.GetCoverAsync(id);
         }
 
         async Task<IEnumerable<Domain.Cover>> ICoversService.GetCoversAsync()

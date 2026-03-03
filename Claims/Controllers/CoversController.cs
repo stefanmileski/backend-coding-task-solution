@@ -21,9 +21,9 @@ namespace Claims.API.Controllers
         }
 
         [HttpGet("{uid}")]
-        public async Task<ActionResult<Cover?>> GetAsync(Guid uid)
+        public async Task<ActionResult<Cover?>> GetAsync(string id)
         {
-            return Ok(await _coversService.GetCoverAsync(uid));
+            return Ok(await _coversService.GetCoverAsync(id));
         }
 
         [HttpPost]
@@ -34,9 +34,9 @@ namespace Claims.API.Controllers
         }
 
         [HttpDelete("{uid}")]
-        public async Task DeleteAsync(Guid uid)
+        public async Task DeleteAsync(string id)
         {
-            await _coversService.DeleteCoverAsync(uid);
+            await _coversService.DeleteCoverAsync(id);
         }
     }
 }
