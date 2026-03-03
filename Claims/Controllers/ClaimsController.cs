@@ -1,25 +1,18 @@
 using Claims.Auditing;
+using Claims.Domain.Claim;
+using Claims.Domain.Cover;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Extensions;
-
 
 namespace Claims.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClaimsController : ControllerBase
+    public class ClaimsController(ClaimsContext claimsContext, AuditContext auditContext) : ControllerBase
     {
-        private readonly ILogger<ClaimsController> _logger;
-        private readonly ClaimsContext _claimsContext;
-        private readonly Auditer _auditer;
-
-        public ClaimsController(ILogger<ClaimsController> logger, ClaimsContext claimsContext, AuditContext auditContext)
-        {
-            _logger = logger;
-            _claimsContext = claimsContext;
-            _auditer = new Auditer(auditContext);
-        }
+        private readonly ClaimsContext _claimsContext = claimsContext;
+        private readonly Auditer _auditer = new(auditContext);
 
         [HttpGet]
         public async Task<IEnumerable<Claim>> GetAsync()
@@ -50,16 +43,10 @@ namespace Claims.Controllers
         }
     }
 
-    public class ClaimsContext : DbContext
+    public class ClaimsContext(DbContextOptions options) : DbContext(options)
     {
-
         private DbSet<Claim> Claims { get; init; }
-        public DbSet<Cover>  Covers { get; init; }
-
-        public ClaimsContext(DbContextOptions options)
-            : base(options)
-        {
-        }
+        public DbSet<Cover> Covers { get; init; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

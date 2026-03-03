@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.2.32519.379
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Claims", "Claims\Claims.csproj", "{268F67FB-056D-4843-8823-19A5F7848271}"
 EndProject
@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Claims.Services", "Claims.Services\Claims.Services.csproj", "{C66F1233-39E6-4BA8-A891-D380F3A42FBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Claims.Domain", "Claims.Domain\Claims.Domain.csproj", "{BA2D3521-FC14-4A43-B0FA-4368994EC93C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +33,14 @@ Global
 		{EC846D1B-22B5-4CED-B0CB-778EBFEE1C33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC846D1B-22B5-4CED-B0CB-778EBFEE1C33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC846D1B-22B5-4CED-B0CB-778EBFEE1C33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C66F1233-39E6-4BA8-A891-D380F3A42FBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C66F1233-39E6-4BA8-A891-D380F3A42FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C66F1233-39E6-4BA8-A891-D380F3A42FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C66F1233-39E6-4BA8-A891-D380F3A42FBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA2D3521-FC14-4A43-B0FA-4368994EC93C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA2D3521-FC14-4A43-B0FA-4368994EC93C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA2D3521-FC14-4A43-B0FA-4368994EC93C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA2D3521-FC14-4A43-B0FA-4368994EC93C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

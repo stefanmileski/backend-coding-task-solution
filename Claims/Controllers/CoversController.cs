@@ -1,4 +1,5 @@
 using Claims.Auditing;
+using Claims.Domain.Cover;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,18 +7,10 @@ namespace Claims.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class CoversController : ControllerBase
+public class CoversController(ClaimsContext claimsContext, AuditContext auditContext) : ControllerBase
 {
-    private readonly ClaimsContext _claimsContext;
-    private readonly ILogger<CoversController> _logger;
-    private readonly Auditer _auditer;
-
-    public CoversController(ClaimsContext claimsContext, AuditContext auditContext, ILogger<CoversController> logger)
-    {
-        _claimsContext = claimsContext;
-        _logger = logger;
-        _auditer = new Auditer(auditContext);
-    }
+    private readonly ClaimsContext _claimsContext = claimsContext;
+    private readonly Auditer _auditer = new(auditContext);
 
     [HttpPost("compute")]
     public async Task<ActionResult> ComputePremiumAsync(DateTime startDate, DateTime endDate, CoverType coverType)
