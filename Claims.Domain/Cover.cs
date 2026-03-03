@@ -8,11 +8,9 @@ namespace Claims.Domain
         public string Id { get; set; } = id;
 
         [BsonElement("startDate")]
-        [BsonDateTimeOptions(DateOnly = true)]
         public DateTime StartDate { get; set; } = startDate;
 
         [BsonElement("endDate")]
-        [BsonDateTimeOptions(DateOnly = true)]
         public DateTime EndDate { get; set; } = endDate;
 
         [BsonElement("claimType")]

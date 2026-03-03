@@ -77,7 +77,7 @@ namespace Claims.Services.Cover
             }
 
             var premiumPerDay = 1250 * multiplier;
-            var insuranceLength = (endDate - startDate).TotalDays;
+            var insuranceLength = (endDate.Date - startDate.Date).TotalDays;
             var totalPremium = 0m;
 
             for (var i = 0; i < insuranceLength; i++)

@@ -11,7 +11,6 @@ namespace Claims.Domain
         public string CoverId { get; set; } = coverId;
 
         [BsonElement("created")]
-        [BsonDateTimeOptions(DateOnly = true)]
         public DateTime Created { get; set; } = created;
 
         [BsonElement("name")]

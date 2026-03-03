@@ -4,7 +4,7 @@ using Claims.Domain;
 using Claims.Services.Cover.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Claims.API.Controllers
+namespace Claims.Controllers
 {
     [ApiController]
     [Route("[controller]")]
