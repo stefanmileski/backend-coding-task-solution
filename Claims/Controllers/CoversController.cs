@@ -20,7 +20,7 @@ namespace Claims.API.Controllers
             return Ok(await _coversService.GetCoversAsync());
         }
 
-        [HttpGet("{uid}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Cover?>> GetAsync(string id)
         {
             return Ok(await _coversService.GetCoverAsync(id));
@@ -33,7 +33,7 @@ namespace Claims.API.Controllers
             return Ok(cover);
         }
 
-        [HttpDelete("{uid}")]
+        [HttpDelete("{id}")]
         public async Task DeleteAsync(string id)
         {
             await _coversService.DeleteCoverAsync(id);
