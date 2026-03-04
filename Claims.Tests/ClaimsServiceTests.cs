@@ -8,6 +8,7 @@ using Claims.Services;
 using Claims.Services.Claim;
 using Claims.Services.Claim.Interfaces;
 using NSubstitute;
+using System.ComponentModel.DataAnnotations;
 using Xunit;
 
 namespace Claims.Tests;
@@ -51,16 +52,14 @@ public class ClaimsServiceTests
     }
 
     [Fact]
-    public async Task CreateClaim_DamageCostExceedsLimit_ReturnsNull()
+    public async Task CreateClaim_DamageCostExceedsLimit_RequestInvalid()
     {
-        // TODO
-        var request = new CreateClaimRequest(CoverId, Now, "Test claim", ClaimType.BadWeather, 100001m);
+        CreateClaimRequest request = new(CoverId, Now, "Test claim", ClaimType.BadWeather, 100001m);
 
-        Result<ClaimResponse> result = await _claimsService.CreateClaimAsync(request);
+        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
 
-        Assert.NotNull(result);
-        Assert.Equal(ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT, result.Message);
-        await _context.DidNotReceive().AddClaimAsync(Arg.Any<Claim>());
+        Assert.Single(errors);
+        Assert.Equal(ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT, errors[0].ErrorMessage);
     }
 
     [Fact]

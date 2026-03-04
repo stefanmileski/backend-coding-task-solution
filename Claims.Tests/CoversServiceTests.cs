@@ -1,5 +1,6 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
+using Claims.Contracts.Validation;
 using Claims.Domain;
 using Claims.Infrastructure.Interfaces;
 using Claims.Infrastructure.Result;
@@ -7,6 +8,7 @@ using Claims.Services;
 using Claims.Services.Cover;
 using Claims.Services.Cover.Interfaces;
 using NSubstitute;
+using System.ComponentModel.DataAnnotations;
 using Xunit;
 
 namespace Claims.Tests;
@@ -46,10 +48,10 @@ public class CoversServiceTests
     {
         CreateCoverRequest request = new(Today.AddDays(-1), Today.AddMonths(3), CoverType.Yacht);
 
-        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
+        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
 
-        Assert.Null(result);
-        await _context.DidNotReceive().AddCoverAsync(Arg.Any<Cover>());
+        Assert.Single(errors);
+        Assert.Equal(ValidationErrors.START_DATE_IN_PAST, errors[0].ErrorMessage);
     }
 
     [Fact]
@@ -57,10 +59,10 @@ public class CoversServiceTests
     {
         CreateCoverRequest request = new(Today, Today.AddYears(1).AddDays(1), CoverType.Yacht);
 
-        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
+        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
 
-        Assert.Null(result);
-        await _context.DidNotReceive().AddCoverAsync(Arg.Any<Cover>());
+        Assert.Single(errors);
+        Assert.Equal(ValidationErrors.END_DATE_TOO_FAR, errors[0].ErrorMessage);
     }
 
     [Fact]
@@ -85,10 +87,10 @@ public class CoversServiceTests
     {
         CreateCoverRequest request = new(Today, Today.AddDays(-1), CoverType.Yacht);
 
-        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
+        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
 
-        Assert.Null(result);
-        await _context.DidNotReceive().AddCoverAsync(Arg.Any<Cover>());
+        Assert.Single(errors);
+        Assert.Equal(ValidationErrors.END_DATE_BEFORE_START_DATE, errors[0].ErrorMessage);
     }
 
     // ── GetCoverAsync ───────────────────────────────────────────────────────

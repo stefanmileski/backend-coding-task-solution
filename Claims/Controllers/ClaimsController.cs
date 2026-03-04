@@ -1,6 +1,7 @@
 using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
 using Claims.Controllers.Base;
+using Claims.Infrastructure.Result;
 using Claims.Services.Claim.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,14 +12,15 @@ namespace Claims.Controllers
     public class ClaimsController(IClaimsService _claimsService) : ApiControllerBase
     {
         [HttpGet("list")]
-        [ProducesResponseType(typeof(IEnumerable<ClaimResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<IEnumerable<ClaimResponse>>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ClaimResponse>>> GetClaimsAsync()
         {
             return OkOrError(await _claimsService.GetClaimsAsync());
         }
 
         [HttpPost("create")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Result<ClaimResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateClaimAsync(CreateClaimRequest request)
         {
@@ -26,7 +28,7 @@ namespace Claims.Controllers
         }
 
         [HttpDelete("{id}/delete")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteClaimAsync(string id)
         {
@@ -34,7 +36,7 @@ namespace Claims.Controllers
         }
 
         [HttpGet("{id}/details")]
-        [ProducesResponseType(typeof(ClaimResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<ClaimResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ClaimResponse>> GetClaimAsync(string id)
         {

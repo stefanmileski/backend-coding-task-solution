@@ -11,7 +11,14 @@ namespace Claims.Services.Cover
     {
         async Task<Result<CoverResponse>> ICoversService.CreateCoverAsync(CreateCoverRequest request)
         {
-            Domain.Cover cover = request.ToDomain(ComputePremium(request.StartDate, request.EndDate, request.Type));
+            Result<decimal> premiumForCover = ComputePremium(request.StartDate, request.EndDate, request.Type);
+
+            if (!premiumForCover.IsSuccess)
+            {
+                return Result<CoverResponse>.Invalid(premiumForCover.Message!);
+            }
+
+            Domain.Cover cover = request.ToDomain(premiumForCover.Value);
 
             Domain.Cover createdCover = await _claimsContext.AddCoverAsync(cover);
 
@@ -51,8 +58,13 @@ namespace Claims.Services.Cover
             return Result<IEnumerable<CoverResponse>>.Ok(covers.Select(cover => cover.ToResponse()));
         }
 
-        public decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
+        public Result<decimal> ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
         {
+            if (endDate.Date < startDate.Date)
+            {
+                return Result<decimal>.Invalid(ResultCodes.END_DATE_BEFORE_START_DATE);
+            }
+
             const decimal baseDayRate = 1250m;
 
             decimal multiplier = coverType switch
@@ -90,7 +102,7 @@ namespace Claims.Services.Cover
                 totalPremium += dayRate;
             }
 
-            return totalPremium;
+            return Result<decimal>.Ok(totalPremium);
         }
     }
 }

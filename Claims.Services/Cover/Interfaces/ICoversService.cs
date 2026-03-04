@@ -40,6 +40,6 @@ namespace Claims.Services.Cover.Interfaces
         /// <param name="endDate">The end date of the coverage period.</param>
         /// <param name="coverType">The type of coverage for which the premium is to be calculated.</param>
         /// <returns>The calculated premium amount for the specified coverage period and type.</returns>
-        decimal ComputePremium(DateTime startDate, DateTime endDate, Domain.CoverType coverType);
+        Result<decimal> ComputePremium(DateTime startDate, DateTime endDate, Domain.CoverType coverType);
     }
 }

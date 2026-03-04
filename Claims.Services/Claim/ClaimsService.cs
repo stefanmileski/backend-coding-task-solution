@@ -12,17 +12,23 @@ namespace Claims.Services.Claim
         async Task<Result<ClaimResponse>> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
         {
             Domain.Cover? cover = await _claimsContext.GetCoverAsync(request.CoverId);
+
             if (cover is null)
             {
                 return Result<ClaimResponse>.NotFound(ResultCodes.COVER_NOT_FOUND);
             }
+
             if (request.Created < cover.StartDate || request.Created > cover.EndDate)
             {
                 return Result<ClaimResponse>.Invalid(ResultCodes.CLAIM_CREATED_NOT_WITHIN_COVER_PERIOD); ;
             }
+
             Domain.Claim claim = request.ToDomain();
+
             Domain.Claim createdClaim = await _claimsContext.AddClaimAsync(claim);
+
             ClaimResponse response = createdClaim.ToResponse();
+
             return Result<ClaimResponse>.Ok(response);
         }
 
