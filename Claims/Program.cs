@@ -1,5 +1,5 @@
-using Claims.Auditing;
 using Claims.Infrastructure;
+using Claims.Infrastructure.Auditing;
 using Claims.Services.Claim;
 using Claims.Services.Claim.Interfaces;
 using Claims.Services.Cover;
@@ -52,6 +52,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IClaimsService, ClaimsService>();
 builder.Services.AddScoped<ICoversService, CoversService>();
+
+builder.Services.AddSingleton<AuditQueue>();
+builder.Services.AddSingleton<Auditer>();
+builder.Services.AddHostedService<AuditWorker>();
 
 var app = builder.Build();
 

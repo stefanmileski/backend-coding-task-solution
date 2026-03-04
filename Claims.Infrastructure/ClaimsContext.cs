@@ -1,13 +1,13 @@
-﻿using Claims.Auditing;
-using Claims.Domain;
+﻿using Claims.Domain;
+using Claims.Infrastructure.Auditing;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace Claims.Infrastructure
 {
-    public class ClaimsContext(DbContextOptions options, AuditContext auditContext) : DbContext(options)
+    public class ClaimsContext(DbContextOptions options, Auditer auditer) : DbContext(options)
     {
-        private readonly Auditer _auditer = new(auditContext);
+        private readonly Auditer _auditer = auditer;
 
         private DbSet<Claim> Claims { get; init; }
         public DbSet<Cover> Covers { get; init; }
