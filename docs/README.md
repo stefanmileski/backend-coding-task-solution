@@ -38,7 +38,7 @@ Claims/
 ├── Infrastructure/    # Data access — MongoDB (ClaimsContext) and SQL Server (AuditContext)
 ├── Domain/            # Core domain models — Claim, Cover
 ├── Contracts/         # Request and response DTOs
-└── Common/            # Shared utilities — Result<T>, ResultType
+└── Core/              # Shared utilities — Result<T>, ResultType
 ```
 
 ### Request Flow
