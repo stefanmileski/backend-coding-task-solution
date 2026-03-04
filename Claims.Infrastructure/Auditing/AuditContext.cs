@@ -1,5 +1,4 @@
-﻿using Claims.Auditing;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Claims.Infrastructure.Auditing
 {

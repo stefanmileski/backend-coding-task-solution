@@ -1,5 +1,4 @@
-﻿using Claims.Auditing;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Claims.Infrastructure.Auditing
