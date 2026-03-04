@@ -2,7 +2,7 @@
 
 namespace Claims.Contracts.Requests
 {
-    public class CreateCoverRequest(DateTime startDate, DateTime endDate, CoverType type, decimal premium)
+    public class CreateCoverRequest(DateTime startDate, DateTime endDate, CoverType type)
     {
         /// <summary>
         /// Start date of the cover
@@ -18,10 +18,5 @@ namespace Claims.Contracts.Requests
         /// Type of the cover
         /// </summary>
         public CoverType Type { get; set; } = type;
-
-        /// <summary>
-        /// Premium for the cover
-        /// </summary>
-        public decimal Premium { get; set; } = premium;
     }
 }
