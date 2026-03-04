@@ -56,10 +56,10 @@ public class ClaimsServiceTests
     {
         CreateClaimRequest request = new(CoverId, Now, "Test claim", ClaimType.BadWeather, 100001m);
 
-        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
+        IEnumerable<ValidationResult> errors = request.Validate(new ValidationContext(request));
 
         Assert.Single(errors);
-        Assert.Equal(ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT, errors[0].ErrorMessage);
+        Assert.Equal(ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT, errors.First().ErrorMessage);
     }
 
     [Fact]

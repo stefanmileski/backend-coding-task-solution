@@ -20,7 +20,7 @@ namespace Claims.Services.Claim
 
             if (request.Created.Date < cover.StartDate.Date || request.Created.Date > cover.EndDate.Date)
             {
-                return Result<ClaimResponse>.Invalid(ResultCodes.CLAIM_CREATED_NOT_WITHIN_COVER_PERIOD); ;
+                return Result<ClaimResponse>.Invalid(ResultCodes.CLAIM_CREATED_NOT_WITHIN_COVER_PERIOD);
             }
 
             Domain.Claim claim = request.ToDomain();

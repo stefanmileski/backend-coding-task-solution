@@ -3,7 +3,7 @@ using Claims.Domain;
 using System.ComponentModel.DataAnnotations;
 namespace Claims.Contracts.Requests
 {
-    public class CreateClaimRequest(string coverId, DateTime created, string name, ClaimType type, decimal damageCost)
+    public class CreateClaimRequest(string coverId, DateTime created, string name, ClaimType type, decimal damageCost): IValidatableObject
     {
         /// <summary>
         /// Related cover id
@@ -28,7 +28,16 @@ namespace Claims.Contracts.Requests
         /// <summary>
         /// Cost of the damage
         /// </summary>
-        [Range(0, 100000, ErrorMessage = ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT)]
         public decimal DamageCost { get; } = damageCost;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (DamageCost > 100000)
+            {
+                return [new ValidationResult(ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT, [nameof(DamageCost)])];
+            }
+
+            return [];
+        }
     }
 }

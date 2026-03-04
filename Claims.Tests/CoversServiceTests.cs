@@ -44,25 +44,25 @@ public class CoversServiceTests
     }
 
     [Fact]
-    public async Task CreateCover_StartDateInPast_ReturnsNull()
+    public async Task CreateCover_StartDateInPast_RequestInvalid()
     {
         CreateCoverRequest request = new(Today.AddDays(-1), Today.AddMonths(3), CoverType.Yacht);
-
-        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
+        
+        IEnumerable<ValidationResult> errors = request.Validate(new ValidationContext(request));
 
         Assert.Single(errors);
-        Assert.Equal(ValidationErrors.START_DATE_IN_PAST, errors[0].ErrorMessage);
+        Assert.Equal(ValidationErrors.START_DATE_IN_PAST, errors.First().ErrorMessage);
     }
 
     [Fact]
-    public async Task CreateCover_PeriodExceedsOneYear_ReturnsNull()
+    public async Task CreateCover_PeriodExceedsOneYear_RequestInvalid()
     {
         CreateCoverRequest request = new(Today, Today.AddYears(1).AddDays(1), CoverType.Yacht);
 
-        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
+        IEnumerable<ValidationResult> errors = request.Validate(new ValidationContext(request));
 
         Assert.Single(errors);
-        Assert.Equal(ValidationErrors.END_DATE_TOO_FAR, errors[0].ErrorMessage);
+        Assert.Equal(ValidationErrors.END_DATE_TOO_FAR, errors.First().ErrorMessage);
     }
 
     [Fact]
@@ -83,14 +83,14 @@ public class CoversServiceTests
     }
 
     [Fact]
-    public async Task CreateCover_EndDateBeforeStartDate_ReturnsNull()
+    public async Task CreateCover_EndDateBeforeStartDate_RequestInvalid()
     {
         CreateCoverRequest request = new(Today, Today.AddDays(-1), CoverType.Yacht);
 
-        IList<ValidationResult> errors = RequestValidationHelper.Validate(request);
+        IEnumerable<ValidationResult> errors = request.Validate(new ValidationContext(request));
 
         Assert.Single(errors);
-        Assert.Equal(ValidationErrors.END_DATE_BEFORE_START_DATE, errors[0].ErrorMessage);
+        Assert.Equal(ValidationErrors.END_DATE_BEFORE_START_DATE, errors.First().ErrorMessage);
     }
 
     // ── GetCoverAsync ───────────────────────────────────────────────────────
