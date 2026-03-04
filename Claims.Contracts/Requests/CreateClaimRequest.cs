@@ -9,18 +9,22 @@ namespace Claims.Contracts.Requests
         /// Related cover id
         /// </summary>
         public string CoverId { get; } = coverId;
+
         /// <summary>
         /// The date when the claim was created
         /// </summary>
         public DateTime Created { get; } = created;
+
         /// <summary>
         /// Name of the claim
         /// </summary>
         public string Name { get; } = name;
+
         /// <summary>
         /// Type of the claim
         /// </summary>
         public ClaimType Type { get; } = type;
+
         /// <summary>
         /// Cost of the damage
         /// </summary>
