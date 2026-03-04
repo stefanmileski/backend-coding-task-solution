@@ -27,8 +27,6 @@ cd Claims.Tests
 dotnet test
 ```
 
-Tests include both unit tests (services) and integration tests (controllers via `WebApplicationFactory`). Integration tests spin up their own isolated Testcontainers instances.
-
 ## Architecture
 
 The solution is structured in layers:
