@@ -18,7 +18,7 @@ namespace Claims.Services.Claim
                 return Result<ClaimResponse>.NotFound(ResultCodes.COVER_NOT_FOUND);
             }
 
-            if (request.Created < cover.StartDate || request.Created > cover.EndDate)
+            if (request.Created.Date < cover.StartDate.Date || request.Created.Date > cover.EndDate.Date)
             {
                 return Result<ClaimResponse>.Invalid(ResultCodes.CLAIM_CREATED_NOT_WITHIN_COVER_PERIOD); ;
             }

@@ -23,17 +23,17 @@ namespace Claims.Contracts.Requests
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (StartDate < DateTime.UtcNow.Date)
+            if (StartDate.Date < DateTime.UtcNow.Date)
             {
                 return [new ValidationResult(ValidationErrors.START_DATE_IN_PAST, [nameof(StartDate)])];
             }
 
-            if (EndDate > StartDate.AddYears(1))
+            if (EndDate.Date > StartDate.Date.AddYears(1))
             {
                 return [new ValidationResult(ValidationErrors.END_DATE_TOO_FAR, [nameof(StartDate), nameof(EndDate)])];
             }
 
-            if (EndDate < StartDate)
+            if (EndDate.Date < StartDate.Date)
             {
                 return [new ValidationResult(ValidationErrors.END_DATE_BEFORE_START_DATE, [nameof(StartDate), nameof(EndDate)])];
             }
