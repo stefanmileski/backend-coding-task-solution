@@ -1,11 +1,11 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
-using Claims.Infrastructure;
+using Claims.Infrastructure.Interfaces;
 using Claims.Services.Claim.Interfaces;
 
 namespace Claims.Services.Claim
 {
-    public class ClaimsService(ClaimsContext _claimsContext) : IClaimsService
+    public class ClaimsService(IClaimsContext _claimsContext) : IClaimsService
     {
         async Task<ClaimResponse?> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
         {

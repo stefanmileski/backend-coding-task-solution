@@ -1,12 +1,12 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
 using Claims.Domain;
-using Claims.Infrastructure;
+using Claims.Infrastructure.Interfaces;
 using Claims.Services.Cover.Interfaces;
 
 namespace Claims.Services.Cover
 {
-    public class CoversService(ClaimsContext _claimsContext) : ICoversService
+    public class CoversService(IClaimsContext _claimsContext) : ICoversService
     {
         async Task<CoverResponse?> ICoversService.CreateCoverAsync(CreateCoverRequest request)
         {
@@ -113,7 +113,10 @@ namespace Claims.Services.Cover
             decimal secondDiscount = isYacht ? 0.08m : 0.03m;
 
             decimal premiumPerDay = baseDayRate * multiplier;
+
+            // 1 is added to include the end date in the calculation
             int insuranceDays = (endDate.Date - startDate.Date).Days + 1;
+
             decimal totalPremium = 0m;
 
             for (int day = 0; day < insuranceDays; day++)
