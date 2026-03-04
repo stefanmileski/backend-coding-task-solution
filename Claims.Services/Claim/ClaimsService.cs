@@ -1,87 +1,55 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
 using Claims.Infrastructure.Interfaces;
+using Claims.Infrastructure.Result;
 using Claims.Services.Claim.Interfaces;
+using Claims.Services.Extensions;
 
 namespace Claims.Services.Claim
 {
     public class ClaimsService(IClaimsContext _claimsContext) : IClaimsService
     {
-        async Task<ClaimResponse?> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
+        async Task<Result<ClaimResponse>> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
         {
-            if (request.DamageCost > 100000)
-            {
-                return null;
-            }
-
             Domain.Cover? cover = await _claimsContext.GetCoverAsync(request.CoverId);
-
-            if (cover is null
-                || (request.Created < cover.StartDate || request.Created > cover.EndDate))
+            if (cover is null)
             {
-                return null;
+                return Result<ClaimResponse>.NotFound(ResultCodes.COVER_NOT_FOUND);
             }
-
-            Domain.Claim claim = new(
-                id: Guid.NewGuid().ToString(),
-                coverId: request.CoverId,
-                created: request.Created,
-                name: request.Name,
-                type: request.Type,
-                damageCost: request.DamageCost);
-
-            Domain.Claim? createdClaim = await _claimsContext.AddClaimAsync(claim);
-
-            if (createdClaim is null)
+            if (request.Created < cover.StartDate || request.Created > cover.EndDate)
             {
-                return null;
+                return Result<ClaimResponse>.Invalid(ResultCodes.CLAIM_CREATED_NOT_WITHIN_COVER_PERIOD); ;
             }
-
-            ClaimResponse response = new(
-                id: createdClaim.Id,
-                coverId: createdClaim.CoverId,
-                created: createdClaim.Created,
-                name: createdClaim.Name,
-                type: createdClaim.Type,
-                damageCost: createdClaim.DamageCost);
-
-            return response;
+            Domain.Claim claim = request.ToDomain();
+            Domain.Claim createdClaim = await _claimsContext.AddClaimAsync(claim);
+            ClaimResponse response = createdClaim.ToResponse();
+            return Result<ClaimResponse>.Ok(response);
         }
 
-        async Task<bool> IClaimsService.DeleteClaimAsync(string id)
+        async Task<Result<bool>> IClaimsService.DeleteClaimAsync(string id)
         {
-            return await _claimsContext.DeleteClaimAsync(id);
+            bool isDeleted = await _claimsContext.DeleteClaimAsync(id);
+            if (!isDeleted)
+            {
+                return Result<bool>.NotFound(ResultCodes.CLAIM_NOT_FOUND);
+            }
+            return Result<bool>.Ok(true);
         }
 
-        async Task<ClaimResponse?> IClaimsService.GetClaimAsync(string id)
+        async Task<Result<ClaimResponse>> IClaimsService.GetClaimAsync(string id)
         {
             Domain.Claim? claim = await _claimsContext.GetClaimAsync(id);
-
             if (claim is null)
             {
-                return null;
+                return Result<ClaimResponse>.NotFound(ResultCodes.CLAIM_NOT_FOUND);
             }
-
-            return new ClaimResponse(
-                id: claim.Id,
-                coverId: claim.CoverId,
-                created: claim.Created,
-                name: claim.Name,
-                type: claim.Type,
-                damageCost: claim.DamageCost);
+            return Result<ClaimResponse>.Ok(claim.ToResponse());
         }
 
-        async Task<IEnumerable<ClaimResponse>> IClaimsService.GetClaimsAsync()
+        async Task<Result<IEnumerable<ClaimResponse>>> IClaimsService.GetClaimsAsync()
         {
             IEnumerable<Domain.Claim> claims = await _claimsContext.GetClaimsAsync();
-
-            return claims.Select(claim => new ClaimResponse(
-                id: claim.Id,
-                coverId: claim.CoverId,
-                created: claim.Created,
-                name: claim.Name,
-                type: claim.Type,
-                damageCost: claim.DamageCost));
+            return Result<IEnumerable<ClaimResponse>>.Ok(claims.Select(claim => claim.ToResponse()));
         }
     }
 }

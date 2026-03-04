@@ -1,5 +1,6 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
+using Claims.Infrastructure.Result;
 
 namespace Claims.Services.Cover.Interfaces
 {
@@ -9,28 +10,28 @@ namespace Claims.Services.Cover.Interfaces
         /// Gets all covers.
         /// </summary>
         /// <returns>All covers, or an empty list.</returns>
-        Task<IEnumerable<CoverResponse>> GetCoversAsync();
+        Task<Result<IEnumerable<CoverResponse>>> GetCoversAsync();
 
         /// <summary>
         /// Creates a new cover.
         /// </summary>
         /// <param name="request">The parameters for the creation of the cover.</param>
         /// <returns>The id of the newly created cover, or null if unsuccessful.</returns>
-        Task<CoverResponse?> CreateCoverAsync(CreateCoverRequest cover);
+        Task<Result<CoverResponse>> CreateCoverAsync(CreateCoverRequest cover);
 
         /// <summary>
         /// Deletes a cover by id.
         /// </summary>
         /// <param name="id">The id of the cover to delete.</param>
         /// <returns>True if the deletion is successful, otherwise false.</returns>
-        Task<bool> DeleteCoverAsync(string id);
+        Task<Result<bool>> DeleteCoverAsync(string id);
 
         /// <summary>
         /// Gets a cover by id.
         /// </summary>
         /// <param name="id">The id of the cover to get.</param>
         /// <returns>The cover with the given id, or null if not found.</returns>
-        Task<CoverResponse?> GetCoverAsync(string id);
+        Task<Result<CoverResponse>> GetCoverAsync(string id);
 
         /// <summary>
         /// Calculates the insurance premium for a specified coverage type over a given date range.

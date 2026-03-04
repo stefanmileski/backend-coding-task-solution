@@ -2,6 +2,8 @@
 using Claims.Contracts.Responses;
 using Claims.Domain;
 using Claims.Infrastructure.Interfaces;
+using Claims.Infrastructure.Result;
+using Claims.Services;
 using Claims.Services.Cover;
 using Claims.Services.Cover.Interfaces;
 using NSubstitute;
@@ -12,13 +14,13 @@ namespace Claims.Tests;
 public class CoversServiceTests
 {
     private readonly IClaimsContext _context = Substitute.For<IClaimsContext>();
-    private readonly ICoversService _sut;
+    private readonly ICoversService _coversService;
 
     private static readonly DateTime Today = DateTime.UtcNow.Date;
 
     public CoversServiceTests()
     {
-        _sut = new CoversService(_context);
+        _coversService = new CoversService(_context);
     }
 
     // ── CreateCoverAsync ────────────────────────────────────────────────────
@@ -26,22 +28,25 @@ public class CoversServiceTests
     [Fact]
     public async Task CreateCover_ValidRequest_ReturnsCover()
     {
-        var request = new CreateCoverRequest(Today, Today.AddMonths(3), CoverType.Yacht);
+        CreateCoverRequest request = new(Today, Today.AddMonths(3), CoverType.Yacht);
         _context.AddCoverAsync(Arg.Any<Cover>()).Returns(c => c.Arg<Cover>());
 
-        CoverResponse? result = await _sut.CreateCoverAsync(request);
+        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
 
-        Assert.NotNull(result);
-        Assert.Equal(CoverType.Yacht, result.Type);
-        Assert.True(result.Premium > 0);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal(CoverType.Yacht, result.Value.Type);
+        Assert.Equal(Today, result.Value.StartDate);
+        Assert.Equal(Today.AddMonths(3), result.Value.EndDate);
+        Assert.True(result.Value.Premium > 0);
     }
 
     [Fact]
     public async Task CreateCover_StartDateInPast_ReturnsNull()
     {
-        var request = new CreateCoverRequest(Today.AddDays(-1), Today.AddMonths(3), CoverType.Yacht);
+        CreateCoverRequest request = new(Today.AddDays(-1), Today.AddMonths(3), CoverType.Yacht);
 
-        CoverResponse? result = await _sut.CreateCoverAsync(request);
+        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
 
         Assert.Null(result);
         await _context.DidNotReceive().AddCoverAsync(Arg.Any<Cover>());
@@ -50,9 +55,9 @@ public class CoversServiceTests
     [Fact]
     public async Task CreateCover_PeriodExceedsOneYear_ReturnsNull()
     {
-        var request = new CreateCoverRequest(Today, Today.AddYears(1).AddDays(1), CoverType.Yacht);
+        CreateCoverRequest request = new(Today, Today.AddYears(1).AddDays(1), CoverType.Yacht);
 
-        CoverResponse? result = await _sut.CreateCoverAsync(request);
+        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
 
         Assert.Null(result);
         await _context.DidNotReceive().AddCoverAsync(Arg.Any<Cover>());
@@ -61,20 +66,26 @@ public class CoversServiceTests
     [Fact]
     public async Task CreateCover_PeriodExactlyOneYear_ReturnsCover()
     {
-        var request = new CreateCoverRequest(Today, Today.AddYears(1), CoverType.Yacht);
+        CreateCoverRequest request = new(Today, Today.AddYears(1), CoverType.Yacht);
         _context.AddCoverAsync(Arg.Any<Cover>()).Returns(c => c.Arg<Cover>());
 
-        CoverResponse? result = await _sut.CreateCoverAsync(request);
+        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
 
-        Assert.NotNull(result);
+        Assert.NotNull(result.Value);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(CoverType.Yacht, result.Value.Type);
+        Assert.Equal(Today, result.Value.StartDate);
+        Assert.Equal(Today.AddYears(1), result.Value.EndDate);
+        Assert.True(result.Value.Premium > 0);
+
     }
 
     [Fact]
     public async Task CreateCover_EndDateBeforeStartDate_ReturnsNull()
     {
-        var request = new CreateCoverRequest(Today, Today.AddDays(-1), CoverType.Yacht);
+        CreateCoverRequest request = new(Today, Today.AddDays(-1), CoverType.Yacht);
 
-        CoverResponse? result = await _sut.CreateCoverAsync(request);
+        Result<CoverResponse> result = await _coversService.CreateCoverAsync(request);
 
         Assert.Null(result);
         await _context.DidNotReceive().AddCoverAsync(Arg.Any<Cover>());
@@ -85,13 +96,13 @@ public class CoversServiceTests
     [Fact]
     public async Task GetCover_ExistingId_ReturnsCover()
     {
-        var cover = new Cover("cover-1", Today, Today.AddMonths(3), CoverType.Yacht, 1000m);
+        Cover cover = new("cover-1", Today, Today.AddMonths(3), CoverType.Yacht, 1000m);
         _context.GetCoverAsync("cover-1").Returns(cover);
 
-        CoverResponse? result = await _sut.GetCoverAsync("cover-1");
+        Result<CoverResponse> result = await _coversService.GetCoverAsync("cover-1");
 
-        Assert.NotNull(result);
-        Assert.Equal("cover-1", result.Id);
+        Assert.NotNull(result.Value);
+        Assert.Equal("cover-1", result.Value.Id);
     }
 
     [Fact]
@@ -99,9 +110,11 @@ public class CoversServiceTests
     {
         _context.GetCoverAsync("nonexistent").Returns((Cover?)null);
 
-        CoverResponse? result = await _sut.GetCoverAsync("nonexistent");
+        Result<CoverResponse> result = await _coversService.GetCoverAsync("nonexistent");
 
-        Assert.Null(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(ResultType.NotFound, result.ResultType);
+        Assert.Equal(ResultCodes.COVER_NOT_FOUND, result.Message);
     }
 
     // ── GetCoversAsync ──────────────────────────────────────────────────────
@@ -109,16 +122,18 @@ public class CoversServiceTests
     [Fact]
     public async Task GetCovers_ReturnsAllCovers()
     {
-        var covers = new List<Cover>
-        {
+        List<Cover> covers = [
             new("cover-1", Today, Today.AddMonths(3), CoverType.Yacht,         1000m),
             new("cover-2", Today, Today.AddMonths(6), CoverType.PassengerShip, 2000m),
-        };
+        ];
+
         _context.GetCoversAsync().Returns(covers);
 
-        IEnumerable<CoverResponse> result = await _sut.GetCoversAsync();
+        Result<IEnumerable<CoverResponse>> result = await _coversService.GetCoversAsync();
 
-        Assert.Equal(2, result.Count());
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal(2, result.Value.Count());
     }
 
     [Fact]
@@ -126,9 +141,11 @@ public class CoversServiceTests
     {
         _context.GetCoversAsync().Returns([]);
 
-        IEnumerable<CoverResponse> result = await _sut.GetCoversAsync();
+        Result<IEnumerable<CoverResponse>> result = await _coversService.GetCoversAsync();
 
-        Assert.Empty(result);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
     }
 
     // ── DeleteCoverAsync ────────────────────────────────────────────────────
@@ -138,9 +155,10 @@ public class CoversServiceTests
     {
         _context.DeleteCoverAsync("cover-1").Returns(true);
 
-        bool result = await _sut.DeleteCoverAsync("cover-1");
+        Result<bool> result = await _coversService.DeleteCoverAsync("cover-1");
 
-        Assert.True(result);
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Value);
     }
 
     [Fact]
@@ -148,9 +166,11 @@ public class CoversServiceTests
     {
         _context.DeleteCoverAsync("nonexistent").Returns(false);
 
-        bool result = await _sut.DeleteCoverAsync("nonexistent");
+        Result<bool> result = await _coversService.DeleteCoverAsync("nonexistent");
 
-        Assert.False(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(ResultType.NotFound, result.ResultType);
+        Assert.Equal(ResultCodes.COVER_NOT_FOUND, result.Message);
     }
 
     // ── ComputePremium ──────────────────────────────────────────────────────
@@ -162,7 +182,7 @@ public class CoversServiceTests
     [InlineData(CoverType.BulkCarrier, 1, 1625.00)]   // 1250 * 1.3
     public void ComputePremium_SingleDay_ReturnsCorrectRate(CoverType type, int days, decimal expected)
     {
-        decimal result = _sut.ComputePremium(Today, Today.AddDays(days - 1), type);
+        decimal result = _coversService.ComputePremium(Today, Today.AddDays(days - 1), type);
 
         Assert.Equal(expected, result);
     }
@@ -173,7 +193,7 @@ public class CoversServiceTests
         decimal premiumPerDay = 1250m * 1.1m;
         decimal expected = premiumPerDay * 30;
 
-        decimal result = _sut.ComputePremium(Today, Today.AddDays(29), CoverType.Yacht);
+        decimal result = _coversService.ComputePremium(Today, Today.AddDays(29), CoverType.Yacht);
 
         Assert.Equal(expected, result);
     }
@@ -185,7 +205,7 @@ public class CoversServiceTests
         decimal expected = premiumPerDay * 30           // first 30 days
                          + premiumPerDay * 0.95m * 1;  // day 31 at 5% discount
 
-        decimal result = _sut.ComputePremium(Today, Today.AddDays(30), CoverType.Yacht);
+        decimal result = _coversService.ComputePremium(Today, Today.AddDays(30), CoverType.Yacht);
 
         Assert.Equal(expected, result);
     }
@@ -198,7 +218,7 @@ public class CoversServiceTests
                          + premiumPerDay * 0.95m * 150 // days 30–179
                          + premiumPerDay * 0.92m * 1;  // day 180 at 8% discount
 
-        decimal result = _sut.ComputePremium(Today, Today.AddDays(180), CoverType.Yacht);
+        decimal result = _coversService.ComputePremium(Today, Today.AddDays(180), CoverType.Yacht);
 
         Assert.Equal(expected, result);
     }
@@ -211,7 +231,7 @@ public class CoversServiceTests
                          + premiumPerDay * 0.98m * 150 // days 30–179
                          + premiumPerDay * 0.97m * 1;  // day 180 at 3% discount
 
-        decimal result = _sut.ComputePremium(Today, Today.AddDays(180), CoverType.BulkCarrier);
+        decimal result = _coversService.ComputePremium(Today, Today.AddDays(180), CoverType.BulkCarrier);
 
         Assert.Equal(expected, result);
     }

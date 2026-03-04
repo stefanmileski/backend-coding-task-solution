@@ -1,5 +1,6 @@
 using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
+using Claims.Controllers.Base;
 using Claims.Domain;
 using Claims.Services.Cover.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace Claims.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CoversController(ICoversService _coversService) : ControllerBase
+    public class CoversController(ICoversService _coversService) : ApiControllerBase
     {
         [HttpPost("compute")]
         [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
@@ -21,7 +22,7 @@ namespace Claims.Controllers
         [ProducesResponseType(typeof(IEnumerable<CoverResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<CoverResponse>>> GetCoversAsync()
         {
-            return Ok(await _coversService.GetCoversAsync());
+            return OkOrError(await _coversService.GetCoversAsync());
         }
 
         [HttpGet("{id}/details")]
@@ -29,14 +30,7 @@ namespace Claims.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CoverResponse?>> GetCoverAsync(string id)
         {
-            CoverResponse? cover = await _coversService.GetCoverAsync(id);
-
-            if (cover == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(cover);
+            return OkOrError(await _coversService.GetCoverAsync(id));
         }
 
         [HttpPost("create")]
@@ -44,14 +38,7 @@ namespace Claims.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateCoverAsync(CreateCoverRequest request)
         {
-            CoverResponse? cover = await _coversService.CreateCoverAsync(request);
-
-            if (cover is null)
-            {
-                return BadRequest("Failed to create cover.");
-            }
-
-            return Ok(cover);
+            return OkOrError(await _coversService.CreateCoverAsync(request));
         }
 
         [HttpDelete("{id}/delete")]
@@ -59,14 +46,7 @@ namespace Claims.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteCoverAsync(string id)
         {
-            bool isDeleted = await _coversService.DeleteCoverAsync(id);
-
-            if (!isDeleted)
-            {
-                return NotFound();
-            }
-
-            return NoContent();
+            return OkOrError(await _coversService.DeleteCoverAsync(id));
         }
     }
 }

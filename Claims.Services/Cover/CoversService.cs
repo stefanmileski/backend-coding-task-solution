@@ -2,100 +2,46 @@
 using Claims.Contracts.Responses;
 using Claims.Domain;
 using Claims.Infrastructure.Interfaces;
+using Claims.Infrastructure.Result;
 using Claims.Services.Cover.Interfaces;
-
+using Claims.Services.Extensions;
 namespace Claims.Services.Cover
 {
     public class CoversService(IClaimsContext _claimsContext) : ICoversService
     {
-        async Task<CoverResponse?> ICoversService.CreateCoverAsync(CreateCoverRequest request)
+        async Task<Result<CoverResponse>> ICoversService.CreateCoverAsync(CreateCoverRequest request)
         {
-            DateTime startDate = request.StartDate.Date;
-            DateTime endDate = request.EndDate.Date;
-
-            if (startDate < DateTime.UtcNow.Date)
-            {
-                return null;
-            }
-
-            if (endDate > startDate.AddYears(1))
-            {
-                return null;
-            }
-
-            if (endDate < startDate)
-            {
-                return null;
-            }
-
-            Domain.Cover cover = new(
-                id: Guid.NewGuid().ToString(),
-                startDate: request.StartDate,
-                endDate: request.EndDate,
-                type: request.Type,
-                premium: ComputePremium(request.StartDate, request.EndDate, request.Type));
-
+            Domain.Cover cover = request.ToDomain(ComputePremium(request.StartDate, request.EndDate, request.Type));
             Domain.Cover createdCover = await _claimsContext.AddCoverAsync(cover);
-
-            if (createdCover is null)
-            {
-                return null;
-            }
-
-            CoverResponse response = new()
-            {
-                Id = createdCover.Id,
-                StartDate = createdCover.StartDate,
-                EndDate = createdCover.EndDate,
-                Type = createdCover.Type,
-                Premium = createdCover.Premium
-            };
-
-            return response;
+            CoverResponse response = createdCover.ToResponse();
+            return Result<CoverResponse>.Ok(response);
         }
-
-        async Task<bool> ICoversService.DeleteCoverAsync(string id)
+        async Task<Result<bool>> ICoversService.DeleteCoverAsync(string id)
         {
-            return await _claimsContext.DeleteCoverAsync(id);
+            bool isDeleted = await _claimsContext.DeleteCoverAsync(id);
+            if (!isDeleted)
+            {
+                return Result<bool>.NotFound(ResultCodes.COVER_NOT_FOUND);
+            }
+            return Result<bool>.Ok(true);
         }
-
-        async Task<CoverResponse?> ICoversService.GetCoverAsync(string id)
+        async Task<Result<CoverResponse>> ICoversService.GetCoverAsync(string id)
         {
             Domain.Cover? cover = await _claimsContext.GetCoverAsync(id);
-
             if (cover is null)
             {
-                return null;
+                return Result<CoverResponse>.NotFound(ResultCodes.COVER_NOT_FOUND);
             }
-
-            return new CoverResponse
-            {
-                Id = cover.Id,
-                StartDate = cover.StartDate,
-                EndDate = cover.EndDate,
-                Type = cover.Type,
-                Premium = cover.Premium
-            };
+            return Result<CoverResponse>.Ok(cover.ToResponse());
         }
-
-        async Task<IEnumerable<CoverResponse>> ICoversService.GetCoversAsync()
+        async Task<Result<IEnumerable<CoverResponse>>> ICoversService.GetCoversAsync()
         {
             IEnumerable<Domain.Cover> covers = await _claimsContext.GetCoversAsync();
-
-            return covers.Select(cover => new CoverResponse
-            {
-                Id = cover.Id,
-                StartDate = cover.StartDate,
-                EndDate = cover.EndDate,
-                Type = cover.Type,
-                Premium = cover.Premium
-            });
+            return Result<IEnumerable<CoverResponse>>.Ok(covers.Select(cover => cover.ToResponse()));
         }
-
         public decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
         {
             const decimal baseDayRate = 1250m;
-
             decimal multiplier = coverType switch
             {
                 CoverType.Yacht => 1.1m,
@@ -103,22 +49,15 @@ namespace Claims.Services.Cover
                 CoverType.Tanker => 1.5m,
                 _ => 1.3m
             };
-
             bool isYacht = coverType == CoverType.Yacht;
-
             // Days 30–179
             decimal firstDiscount = isYacht ? 0.05m : 0.02m;
-
             // Days 180+ (additional 3%/1% on top)
             decimal secondDiscount = isYacht ? 0.08m : 0.03m;
-
             decimal premiumPerDay = baseDayRate * multiplier;
-
             // 1 is added to include the end date in the calculation
             int insuranceDays = (endDate.Date - startDate.Date).Days + 1;
-
             decimal totalPremium = 0m;
-
             for (int day = 0; day < insuranceDays; day++)
             {
                 decimal dayRate = day switch
@@ -127,10 +66,8 @@ namespace Claims.Services.Cover
                     < 180 => premiumPerDay * (1 - firstDiscount),
                     _ => premiumPerDay * (1 - secondDiscount),
                 };
-
                 totalPremium += dayRate;
             }
-
             return totalPremium;
         }
     }

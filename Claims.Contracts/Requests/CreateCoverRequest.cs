@@ -1,8 +1,10 @@
-﻿using Claims.Domain;
+﻿using Claims.Contracts.Validation;
+using Claims.Domain;
+using System.ComponentModel.DataAnnotations;
 
 namespace Claims.Contracts.Requests
 {
-    public class CreateCoverRequest(DateTime startDate, DateTime endDate, CoverType type)
+    public class CreateCoverRequest(DateTime startDate, DateTime endDate, CoverType type): IValidatableObject
     {
         /// <summary>
         /// Start date of the cover
@@ -18,5 +20,25 @@ namespace Claims.Contracts.Requests
         /// Type of the cover
         /// </summary>
         public CoverType Type { get; set; } = type;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (StartDate < DateTime.UtcNow.Date)
+            {
+                return [new ValidationResult(ValidationErrors.START_DATE_IN_PAST, [nameof(StartDate)])];
+            }
+
+            if (EndDate > StartDate.AddYears(1))
+            {
+                return [new ValidationResult(ValidationErrors.END_DATE_TOO_FAR, [nameof(StartDate), nameof(EndDate)])];
+            }
+
+            if (EndDate < StartDate)
+            {
+                return [new ValidationResult(ValidationErrors.END_DATE_BEFORE_START_DATE, [nameof(StartDate), nameof(EndDate)])];
+            }
+
+            return [];
+        }
     }
 }

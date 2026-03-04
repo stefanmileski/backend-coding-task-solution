@@ -1,5 +1,6 @@
 using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
+using Claims.Controllers.Base;
 using Claims.Services.Claim.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,13 +8,13 @@ namespace Claims.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClaimsController(IClaimsService _claimsService) : ControllerBase
+    public class ClaimsController(IClaimsService _claimsService) : ApiControllerBase
     {
         [HttpGet("list")]
         [ProducesResponseType(typeof(IEnumerable<ClaimResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ClaimResponse>>> GetClaimsAsync()
         {
-            return Ok(await _claimsService.GetClaimsAsync());
+            return OkOrError(await _claimsService.GetClaimsAsync());
         }
 
         [HttpPost("create")]
@@ -21,14 +22,7 @@ namespace Claims.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateClaimAsync(CreateClaimRequest request)
         {
-            ClaimResponse? claim = await _claimsService.CreateClaimAsync(request);
-
-            if (claim is null)
-            {
-                return BadRequest("Failed to create claim.");
-            }
-
-            return Ok(claim);
+            return OkOrError(await _claimsService.CreateClaimAsync(request));
         }
 
         [HttpDelete("{id}/delete")]
@@ -36,14 +30,7 @@ namespace Claims.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteClaimAsync(string id)
         {
-            bool isDeleted = await _claimsService.DeleteClaimAsync(id);
-
-            if (!isDeleted)
-            {
-                return NotFound();
-            }
-
-            return NoContent();
+            return OkOrError(await _claimsService.DeleteClaimAsync(id));
         }
 
         [HttpGet("{id}/details")]
@@ -51,14 +38,7 @@ namespace Claims.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ClaimResponse>> GetClaimAsync(string id)
         {
-            ClaimResponse? claim = await _claimsService.GetClaimAsync(id);
-
-            if (claim == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(claim);
+            return OkOrError(await _claimsService.GetClaimAsync(id));
         }
     }
 }
