@@ -1,6 +1,6 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
-using Claims.Infrastructure.Result;
+using Claims.Core.Result;
 
 namespace Claims.Services.Cover.Interfaces
 {

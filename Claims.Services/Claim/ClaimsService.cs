@@ -1,7 +1,7 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
 using Claims.Infrastructure.Interfaces;
-using Claims.Infrastructure.Result;
+using Claims.Core.Result;
 using Claims.Services.Claim.Interfaces;
 using Claims.Services.Extensions;
 

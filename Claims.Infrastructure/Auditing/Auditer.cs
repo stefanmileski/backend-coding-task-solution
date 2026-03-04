@@ -1,6 +1,8 @@
-﻿namespace Claims.Infrastructure.Auditing
+﻿using Claims.Infrastructure.Auditing.Interfaces;
+
+namespace Claims.Infrastructure.Auditing
 {
-    public class Auditer(AuditQueue queue)
+    public class Auditer(AuditQueue queue): IAuditer
     {
         private readonly AuditQueue _queue = queue;
 

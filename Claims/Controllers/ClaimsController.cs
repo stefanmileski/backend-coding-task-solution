@@ -1,7 +1,7 @@
 using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
 using Claims.Controllers.Base;
-using Claims.Infrastructure.Result;
+using Claims.Core.Result;
 using Claims.Services.Claim.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

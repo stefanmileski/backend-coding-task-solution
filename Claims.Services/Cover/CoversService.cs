@@ -2,7 +2,7 @@
 using Claims.Contracts.Responses;
 using Claims.Domain;
 using Claims.Infrastructure.Interfaces;
-using Claims.Infrastructure.Result;
+using Claims.Core.Result;
 using Claims.Services.Cover.Interfaces;
 using Claims.Services.Extensions;
 namespace Claims.Services.Cover

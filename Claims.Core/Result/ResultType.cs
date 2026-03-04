@@ -1,4 +1,4 @@
-﻿namespace Claims.Infrastructure.Result
+﻿namespace Claims.Core.Result
 {
     public enum ResultType
     {

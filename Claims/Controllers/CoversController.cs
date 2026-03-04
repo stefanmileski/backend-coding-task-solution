@@ -2,7 +2,7 @@ using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
 using Claims.Controllers.Base;
 using Claims.Domain;
-using Claims.Infrastructure.Result;
+using Claims.Core.Result;
 using Claims.Services.Cover.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

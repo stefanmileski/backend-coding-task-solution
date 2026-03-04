@@ -1,4 +1,4 @@
-﻿namespace Claims.Services
+﻿namespace Claims.Core.Result
 {
     public static class ResultCodes
     {

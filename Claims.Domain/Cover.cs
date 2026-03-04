@@ -25,7 +25,7 @@ namespace Claims.Domain
         /// <summary>
         /// The type of the cover.
         /// </summary>
-        [BsonElement("claimType")]
+        [BsonElement("coverType")]
         public CoverType Type { get; set; } = type;
 
         /// <summary>

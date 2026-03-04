@@ -1,4 +1,4 @@
-﻿using Claims.Infrastructure.Result;
+﻿using Claims.Core.Result;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Claims.Controllers.Base

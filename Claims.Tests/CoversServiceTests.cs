@@ -3,7 +3,7 @@ using Claims.Contracts.Responses;
 using Claims.Contracts.Validation;
 using Claims.Domain;
 using Claims.Infrastructure.Interfaces;
-using Claims.Infrastructure.Result;
+using Claims.Core.Result;
 using Claims.Services;
 using Claims.Services.Cover;
 using Claims.Services.Cover.Interfaces;
