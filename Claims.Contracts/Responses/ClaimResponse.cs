@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Claims.Contracts.Responses
 {
-    public class GetClaimResponse(string id, string coverId, DateTime created, string name, ClaimType type, decimal damageCost)
+    public class ClaimResponse(string id, string coverId, DateTime created, string name, ClaimType type, decimal damageCost)
     {
         /// <summary>
         /// Claim id

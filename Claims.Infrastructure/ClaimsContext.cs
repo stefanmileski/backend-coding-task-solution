@@ -31,14 +31,14 @@ namespace Claims.Infrastructure
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<string> AddClaimAsync(Claim claim)
+        public async Task<Claim> AddClaimAsync(Claim claim)
         {
             Claims.Add(claim);
             await SaveChangesAsync();
 
             _auditer.AuditClaim(claim.Id, "POST");
 
-            return claim.Id;
+            return claim;
         }
 
         public async Task<bool> DeleteClaimAsync(string id)
@@ -69,14 +69,14 @@ namespace Claims.Infrastructure
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<string> AddCoverAsync(Cover cover)
+        public async Task<Cover> AddCoverAsync(Cover cover)
         {
             Covers.Add(cover);
             await SaveChangesAsync();
 
             _auditer.AuditCover(cover.Id, "POST");
 
-            return cover.Id;
+            return cover;
         }
 
         public async Task<bool> DeleteCoverAsync(string id)

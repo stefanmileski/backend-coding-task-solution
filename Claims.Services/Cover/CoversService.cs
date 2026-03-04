@@ -8,7 +8,7 @@ namespace Claims.Services.Cover
 {
     public class CoversService(ClaimsContext _claimsContext) : ICoversService
     {
-        async Task<string?> ICoversService.CreateCoverAsync(CreateCoverRequest request)
+        async Task<CoverResponse?> ICoversService.CreateCoverAsync(CreateCoverRequest request)
         {
             DateTime startDate = request.StartDate.Date;
             DateTime endDate = request.EndDate.Date;
@@ -35,7 +35,23 @@ namespace Claims.Services.Cover
                 type: request.Type,
                 premium: ComputePremium(request.StartDate, request.EndDate, request.Type));
 
-            return await _claimsContext.AddCoverAsync(cover);
+            Domain.Cover createdCover = await _claimsContext.AddCoverAsync(cover);
+
+            if (createdCover is null)
+            {
+                return null;
+            }
+
+            CoverResponse response = new()
+            {
+                Id = createdCover.Id,
+                StartDate = createdCover.StartDate,
+                EndDate = createdCover.EndDate,
+                Type = createdCover.Type,
+                Premium = createdCover.Premium
+            };
+
+            return response;
         }
 
         async Task<bool> ICoversService.DeleteCoverAsync(string id)
@@ -43,7 +59,7 @@ namespace Claims.Services.Cover
             return await _claimsContext.DeleteCoverAsync(id);
         }
 
-        async Task<GetCoverResponse?> ICoversService.GetCoverAsync(string id)
+        async Task<CoverResponse?> ICoversService.GetCoverAsync(string id)
         {
             Domain.Cover? cover = await _claimsContext.GetCoverAsync(id);
 
@@ -52,7 +68,7 @@ namespace Claims.Services.Cover
                 return null;
             }
 
-            return new GetCoverResponse
+            return new CoverResponse
             {
                 Id = cover.Id,
                 StartDate = cover.StartDate,
@@ -62,11 +78,11 @@ namespace Claims.Services.Cover
             };
         }
 
-        async Task<IEnumerable<GetCoverResponse>> ICoversService.GetCoversAsync()
+        async Task<IEnumerable<CoverResponse>> ICoversService.GetCoversAsync()
         {
             IEnumerable<Domain.Cover> covers = await _claimsContext.GetCoversAsync();
 
-            return covers.Select(cover => new GetCoverResponse
+            return covers.Select(cover => new CoverResponse
             {
                 Id = cover.Id,
                 StartDate = cover.StartDate,
@@ -97,7 +113,7 @@ namespace Claims.Services.Cover
             decimal secondDiscount = isYacht ? 0.08m : 0.03m;
 
             decimal premiumPerDay = baseDayRate * multiplier;
-            int insuranceDays = (endDate.Date - startDate.Date).Days;
+            int insuranceDays = (endDate.Date - startDate.Date).Days + 1;
             decimal totalPremium = 0m;
 
             for (int day = 0; day < insuranceDays; day++)

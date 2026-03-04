@@ -9,14 +9,14 @@ namespace Claims.Services.Cover.Interfaces
         /// Gets all covers.
         /// </summary>
         /// <returns>All covers, or an empty list.</returns>
-        Task<IEnumerable<GetCoverResponse>> GetCoversAsync();
+        Task<IEnumerable<CoverResponse>> GetCoversAsync();
 
         /// <summary>
         /// Creates a new cover.
         /// </summary>
         /// <param name="request">The parameters for the creation of the cover.</param>
         /// <returns>The id of the newly created cover, or null if unsuccessful.</returns>
-        Task<string?> CreateCoverAsync(CreateCoverRequest cover);
+        Task<CoverResponse?> CreateCoverAsync(CreateCoverRequest cover);
 
         /// <summary>
         /// Deletes a cover by id.
@@ -30,7 +30,7 @@ namespace Claims.Services.Cover.Interfaces
         /// </summary>
         /// <param name="id">The id of the cover to get.</param>
         /// <returns>The cover with the given id, or null if not found.</returns>
-        Task<GetCoverResponse?> GetCoverAsync(string id);
+        Task<CoverResponse?> GetCoverAsync(string id);
 
         /// <summary>
         /// Calculates the insurance premium for a specified coverage type over a given date range.

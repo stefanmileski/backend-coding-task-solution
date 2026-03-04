@@ -2,7 +2,7 @@
 
 namespace Claims.Contracts.Responses
 {
-    public class GetCoverResponse
+    public class CoverResponse
     {
         /// <summary>
         /// Cover identifier

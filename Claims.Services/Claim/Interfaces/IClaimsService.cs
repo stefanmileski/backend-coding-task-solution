@@ -9,14 +9,14 @@ namespace Claims.Services.Claim.Interfaces
         /// Gets all claims.
         /// </summary>
         /// <returns>All claims, or an empty list.</returns>
-        Task<IEnumerable<GetClaimResponse>> GetClaimsAsync();
+        Task<IEnumerable<ClaimResponse>> GetClaimsAsync();
 
         /// <summary>
         /// Creates a new claim.
         /// </summary>
         /// <param name="request">The parameters for the creation of the claim.</param>
         /// <returns>The id of the newly created claim, or null if unsuccessful.</returns>
-        Task<string?> CreateClaimAsync(CreateClaimRequest request);
+        Task<ClaimResponse?> CreateClaimAsync(CreateClaimRequest request);
 
         /// <summary>
         /// Deletes a claim by id.
@@ -30,6 +30,6 @@ namespace Claims.Services.Claim.Interfaces
         /// </summary>
         /// <param name="id">The id of the claim to get.</param>
         /// <returns>The claim with the given id, or null if not found.</returns>
-        Task<GetClaimResponse?> GetClaimAsync(string id);
+        Task<ClaimResponse?> GetClaimAsync(string id);
     }
 }

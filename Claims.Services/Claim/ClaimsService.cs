@@ -7,7 +7,7 @@ namespace Claims.Services.Claim
 {
     public class ClaimsService(ClaimsContext _claimsContext) : IClaimsService
     {
-        async Task<string?> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
+        async Task<ClaimResponse?> IClaimsService.CreateClaimAsync(CreateClaimRequest request)
         {
             if (request.DamageCost > 100000)
             {
@@ -30,7 +30,22 @@ namespace Claims.Services.Claim
                 type: request.Type,
                 damageCost: request.DamageCost);
 
-            return await _claimsContext.AddClaimAsync(claim);
+            Domain.Claim? createdClaim = await _claimsContext.AddClaimAsync(claim);
+
+            if (createdClaim is null)
+            {
+                return null;
+            }
+
+            ClaimResponse response = new(
+                id: createdClaim.Id,
+                coverId: createdClaim.CoverId,
+                created: createdClaim.Created,
+                name: createdClaim.Name,
+                type: createdClaim.Type,
+                damageCost: createdClaim.DamageCost);
+
+            return response;
         }
 
         async Task<bool> IClaimsService.DeleteClaimAsync(string id)
@@ -38,7 +53,7 @@ namespace Claims.Services.Claim
             return await _claimsContext.DeleteClaimAsync(id);
         }
 
-        async Task<GetClaimResponse?> IClaimsService.GetClaimAsync(string id)
+        async Task<ClaimResponse?> IClaimsService.GetClaimAsync(string id)
         {
             Domain.Claim? claim = await _claimsContext.GetClaimAsync(id);
 
@@ -47,7 +62,7 @@ namespace Claims.Services.Claim
                 return null;
             }
 
-            return new GetClaimResponse(
+            return new ClaimResponse(
                 id: claim.Id,
                 coverId: claim.CoverId,
                 created: claim.Created,
@@ -56,11 +71,11 @@ namespace Claims.Services.Claim
                 damageCost: claim.DamageCost);
         }
 
-        async Task<IEnumerable<GetClaimResponse>> IClaimsService.GetClaimsAsync()
+        async Task<IEnumerable<ClaimResponse>> IClaimsService.GetClaimsAsync()
         {
             IEnumerable<Domain.Claim> claims = await _claimsContext.GetClaimsAsync();
 
-            return claims.Select(claim => new GetClaimResponse(
+            return claims.Select(claim => new ClaimResponse(
                 id: claim.Id,
                 coverId: claim.CoverId,
                 created: claim.Created,
