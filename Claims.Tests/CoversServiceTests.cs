@@ -184,9 +184,9 @@ public class CoversServiceTests
     [InlineData(CoverType.BulkCarrier, 1, 1625.00)]   // 1250 * 1.3
     public void ComputePremium_SingleDay_ReturnsCorrectRate(CoverType type, int days, decimal expected)
     {
-        decimal result = _coversService.ComputePremium(Today, Today.AddDays(days - 1), type);
+        Result<decimal> result = _coversService.ComputePremium(Today, Today.AddDays(days - 1), type);
 
-        Assert.Equal(expected, result);
+        Assert.Equal(expected, result.Value);
     }
 
     [Fact]
@@ -195,9 +195,9 @@ public class CoversServiceTests
         decimal premiumPerDay = 1250m * 1.1m;
         decimal expected = premiumPerDay * 30;
 
-        decimal result = _coversService.ComputePremium(Today, Today.AddDays(29), CoverType.Yacht);
+        Result<decimal> result = _coversService.ComputePremium(Today, Today.AddDays(29), CoverType.Yacht);
 
-        Assert.Equal(expected, result);
+        Assert.Equal(expected, result.Value);
     }
 
     [Fact]
@@ -207,9 +207,9 @@ public class CoversServiceTests
         decimal expected = premiumPerDay * 30           // first 30 days
                          + premiumPerDay * 0.95m * 1;  // day 31 at 5% discount
 
-        decimal result = _coversService.ComputePremium(Today, Today.AddDays(30), CoverType.Yacht);
+        Result<decimal> result = _coversService.ComputePremium(Today, Today.AddDays(30), CoverType.Yacht);
 
-        Assert.Equal(expected, result);
+        Assert.Equal(expected, result.Value);
     }
 
     [Fact]
@@ -220,21 +220,31 @@ public class CoversServiceTests
                          + premiumPerDay * 0.95m * 150 // days 30–179
                          + premiumPerDay * 0.92m * 1;  // day 180 at 8% discount
 
-        decimal result = _coversService.ComputePremium(Today, Today.AddDays(180), CoverType.Yacht);
+        Result<decimal> result = _coversService.ComputePremium(Today, Today.AddDays(180), CoverType.Yacht);
 
-        Assert.Equal(expected, result);
+        Assert.Equal(expected, result.Value);
     }
 
     [Fact]
     public void ComputePremium_NonYacht_181Days_AppliesSecondDiscount()
     {
         decimal premiumPerDay = 1250m * 1.3m;
-        decimal expected = premiumPerDay * 30           // days 0–29
+        decimal expected = premiumPerDay * 30          // days 0–29
                          + premiumPerDay * 0.98m * 150 // days 30–179
                          + premiumPerDay * 0.97m * 1;  // day 180 at 3% discount
 
-        decimal result = _coversService.ComputePremium(Today, Today.AddDays(180), CoverType.BulkCarrier);
+        Result<decimal> result = _coversService.ComputePremium(Today, Today.AddDays(180), CoverType.BulkCarrier);
 
-        Assert.Equal(expected, result);
+        Assert.Equal(expected, result.Value);
+    }
+
+    [Fact]
+    public void ComputePremium_EndDateBeforeStartDate_ReturnsError()
+    {
+        Result<decimal> result = _coversService.ComputePremium(Today, Today.AddDays(-1), CoverType.Yacht);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(ResultType.Invalid, result.ResultType);
+        Assert.Equal(ResultCodes.END_DATE_BEFORE_START_DATE, result.Message);
     }
 }

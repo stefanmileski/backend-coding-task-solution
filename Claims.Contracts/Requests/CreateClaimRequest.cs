@@ -28,7 +28,7 @@ namespace Claims.Contracts.Requests
         /// <summary>
         /// Cost of the damage
         /// </summary>
-        [Range(typeof(decimal), "0", "100000", ErrorMessage = ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT)]
+        [Range(0, 100000, ErrorMessage = ValidationErrors.CLAIM_DAMAGE_COST_EXCEEDS_LIMIT)]
         public decimal DamageCost { get; } = damageCost;
     }
 }
