@@ -68,7 +68,7 @@ namespace Claims.Controllers
         /// The total insurance period cannot exceed one year.
         /// </remarks>
         [HttpPost("create")]
-        [ProducesResponseType(typeof(Result<CoverResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Result<CoverResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateCoverAsync(CreateCoverRequest request)

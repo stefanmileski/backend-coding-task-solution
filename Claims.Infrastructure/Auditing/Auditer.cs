@@ -2,10 +2,8 @@
 
 namespace Claims.Infrastructure.Auditing
 {
-    public class Auditer(AuditQueue queue): IAuditer
+    public class Auditer(IAuditQueue _queue): IAuditer
     {
-        private readonly AuditQueue _queue = queue;
-
         public void AuditClaim(string id, string httpRequestType) =>
             _queue.Enqueue(new ClaimAuditMessage(id, httpRequestType));
 

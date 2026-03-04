@@ -1,3 +1,4 @@
+using Claims.Core.Clock;
 using Claims.Infrastructure;
 using Claims.Infrastructure.Auditing;
 using Claims.Infrastructure.Auditing.Interfaces;
@@ -57,7 +58,8 @@ builder.Services.AddScoped<ICoversService, CoversService>();
 builder.Services.AddScoped<IClaimsContext, ClaimsContext>();
 builder.Services.AddScoped<IAuditer, Auditer>();
 
-builder.Services.AddSingleton<AuditQueue>();
+builder.Services.AddSingleton<IAuditQueue, AuditQueue>();
+builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddHostedService<AuditWorker>();
 
 builder.Services.AddSwaggerGen(c =>

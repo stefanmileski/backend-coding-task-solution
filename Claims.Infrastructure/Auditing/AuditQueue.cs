@@ -1,8 +1,9 @@
-﻿using System.Threading.Channels;
+﻿using Claims.Infrastructure.Auditing.Interfaces;
+using System.Threading.Channels;
 
 namespace Claims.Infrastructure.Auditing
 {
-    public class AuditQueue
+    public class AuditQueue: IAuditQueue
     {
         private readonly Channel<AuditMessage> _channel =
             Channel.CreateUnbounded<AuditMessage>(new UnboundedChannelOptions

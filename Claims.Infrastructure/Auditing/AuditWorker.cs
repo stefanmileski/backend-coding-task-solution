@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Claims.Infrastructure.Auditing.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Claims.Infrastructure.Auditing
 {
-    public class AuditWorker(AuditQueue queue, IServiceScopeFactory scopeFactory): BackgroundService
+    public class AuditWorker(IAuditQueue _queue, IServiceScopeFactory scopeFactory): BackgroundService
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await foreach (AuditMessage message in queue.Reader.ReadAllAsync(stoppingToken))
+            await foreach (AuditMessage message in _queue.Reader.ReadAllAsync(stoppingToken))
             {
                 await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
                 AuditContext db = scope.ServiceProvider.GetRequiredService<AuditContext>();
