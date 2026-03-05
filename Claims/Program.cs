@@ -17,20 +17,32 @@ using Testcontainers.MsSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Start Testcontainers for SQL Server and MongoDB
-var sqlContainer = (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-        ? new MsSqlBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        : new()
+string? sqlConnectionString;
+string? mongoConnectionString;
 
-    ).Build();
+if (builder.Configuration.GetValue<bool>("UseTestContainers"))
+{
+    // Start Testcontainers for SQL Server and MongoDB
+    var sqlContainer = (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+            ? new MsSqlBuilder().WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+            : new MsSqlBuilder()
+        ).Build();
 
-var mongoContainer = new MongoDbBuilder()
-    .WithImage("mongo:latest")
-    .Build();
+    var mongoContainer = new MongoDbBuilder()
+        .WithImage("mongo:latest")
+        .Build();
 
-await sqlContainer.StartAsync();
-await mongoContainer.StartAsync();
+    await sqlContainer.StartAsync();
+    await mongoContainer.StartAsync();
+
+    sqlConnectionString = sqlContainer.GetConnectionString();
+    mongoConnectionString = mongoContainer.GetConnectionString();
+}
+else
+{
+    sqlConnectionString = builder.Configuration.GetConnectionString("SqlServer");
+    mongoConnectionString = builder.Configuration.GetConnectionString("MongoDb");
+}
 
 // Add services to the container.
 builder.Services
@@ -41,11 +53,11 @@ builder.Services
     });
 
 builder.Services.AddDbContext<AuditContext>(options =>
-    options.UseSqlServer(sqlContainer.GetConnectionString()));
+    options.UseSqlServer(sqlConnectionString));
 
 builder.Services.AddDbContext<ClaimsContext>(options =>
 {
-    var client = new MongoClient(mongoContainer.GetConnectionString());
+    var client = new MongoClient(mongoConnectionString);
     var database = client.GetDatabase(builder.Configuration["MongoDb:DatabaseName"]); // Use a default/test database name
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
