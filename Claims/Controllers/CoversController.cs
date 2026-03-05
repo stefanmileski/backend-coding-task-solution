@@ -29,7 +29,7 @@ namespace Claims.Controllers
         /// </remarks>
         [HttpPost("compute")]
         [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
-        public async Task<ActionResult> ComputePremiumAsync(DateTime startDate, DateTime endDate, CoverType coverType)
+        public ActionResult ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
         {
             return OkOrError(_coversService.ComputePremium(startDate, endDate, coverType));
         }

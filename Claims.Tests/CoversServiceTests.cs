@@ -108,7 +108,7 @@ public class CoversServiceTests
     }
 
     [Fact]
-    public async Task GetCover_NonExistentId_ReturnsNull()
+    public async Task GetCover_NonExistentId_ReturnsNotFound()
     {
         _context.GetCoverAsync("nonexistent").Returns((Cover?)null);
 
@@ -239,7 +239,7 @@ public class CoversServiceTests
     }
 
     [Fact]
-    public void ComputePremium_EndDateBeforeStartDate_ReturnsError()
+    public void ComputePremium_EndDateBeforeStartDate_ReturnsInvalid()
     {
         Result<decimal> result = _coversService.ComputePremium(Today, Today.AddDays(-1), CoverType.Yacht);
 

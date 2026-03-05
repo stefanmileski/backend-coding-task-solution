@@ -73,7 +73,6 @@ public class ClaimsServiceTests
 
         Assert.NotNull(result.Value);
         Assert.True(result.IsSuccess);
-        Assert.NotNull(request);
     }
 
     [Fact]

@@ -58,6 +58,15 @@ namespace Claims.Services.Cover
             return Result<IEnumerable<CoverResponse>>.Ok(covers.Select(cover => cover.ToResponse()));
         }
 
+        private const int FirstTierDays = 30;
+        private const int SecondTierDays = 180;
+
+        private const decimal YachtSecondTierDiscount = 0.05m;
+        private const decimal OtherSecondTierDiscount = 0.02m;
+
+        private const decimal YachtThirdTierDiscount = 0.08m;
+        private const decimal OtherThirdTierDiscount = 0.03m;
+
         public Result<decimal> ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
         {
             if (endDate.Date < startDate.Date)
@@ -65,44 +74,54 @@ namespace Claims.Services.Cover
                 return Result<decimal>.Invalid(ResultCodes.END_DATE_BEFORE_START_DATE);
             }
 
-            const decimal baseDayRate = 1250m;
+            decimal premiumPerDay = GetDailyPremium(coverType);
 
-            decimal multiplier = coverType switch
-            {
-                CoverType.Yacht => 1.1m,
-                CoverType.PassengerShip => 1.2m,
-                CoverType.Tanker => 1.5m,
-                _ => 1.3m
-            };
-
-            bool isYacht = coverType == CoverType.Yacht;
-
-            // Days 30–179
-            decimal firstDiscount = isYacht ? 0.05m : 0.02m;
-
-            // Days 180+ (additional 3%/1% on top)
-            decimal secondDiscount = isYacht ? 0.08m : 0.03m;
-
-            decimal premiumPerDay = baseDayRate * multiplier;
-
-            // 1 is added to include the end date in the calculation
             int insuranceDays = (endDate.Date - startDate.Date).Days + 1;
+
+            decimal secondTierDiscount = coverType == CoverType.Yacht
+                ? YachtSecondTierDiscount
+                : OtherSecondTierDiscount;
+
+            decimal thirdTierDiscount = coverType == CoverType.Yacht
+                ? YachtThirdTierDiscount
+                : OtherThirdTierDiscount;
 
             decimal totalPremium = 0m;
 
             for (int day = 0; day < insuranceDays; day++)
             {
-                decimal dayRate = day switch
-                {
-                    < 30 => premiumPerDay,
-                    < 180 => premiumPerDay * (1 - firstDiscount),
-                    _ => premiumPerDay * (1 - secondDiscount),
-                };
-
-                totalPremium += dayRate;
+                totalPremium += GetDailyRate(day, premiumPerDay, secondTierDiscount, thirdTierDiscount);
             }
 
             return Result<decimal>.Ok(totalPremium);
+        }
+
+        private decimal GetDailyRate(
+            int dayIndex,
+            decimal premiumPerDay,
+            decimal secondTierDiscount,
+            decimal thirdTierDiscount)
+        {
+            if (dayIndex < FirstTierDays)
+                return premiumPerDay;
+
+            if (dayIndex < SecondTierDays)
+                return premiumPerDay * (1 - secondTierDiscount);
+
+            return premiumPerDay * (1 - thirdTierDiscount);
+        }
+
+        private decimal GetDailyPremium(CoverType coverType)
+        {
+            const decimal BaseDayRate = 1250m;
+
+            return coverType switch
+            {
+                CoverType.Yacht => BaseDayRate * 1.1m,
+                CoverType.PassengerShip => BaseDayRate * 1.2m,
+                CoverType.Tanker => BaseDayRate * 1.5m,
+                _ => BaseDayRate * 1.3m
+            };
         }
     }
 }
