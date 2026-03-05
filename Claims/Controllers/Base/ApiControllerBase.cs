@@ -24,7 +24,7 @@ namespace Claims.Controllers.Base
         /// </returns>
         protected ActionResult OkOrError<T>(Result<T> result) => result.ResultType switch
         {
-            ResultType.Ok => Ok(result.Value),
+            ResultType.Ok => Ok(result),
             ResultType.NotFound => NotFound(new ProblemDetails
             {
                 Title = "Not Found",
