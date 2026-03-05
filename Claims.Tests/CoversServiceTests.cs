@@ -1,9 +1,10 @@
 ﻿using Claims.Contracts.Requests;
 using Claims.Contracts.Responses;
 using Claims.Contracts.Validation;
+using Claims.Core.Clock;
+using Claims.Core.Result;
 using Claims.Domain;
 using Claims.Infrastructure.Interfaces;
-using Claims.Core.Result;
 using Claims.Services;
 using Claims.Services.Cover;
 using Claims.Services.Cover.Interfaces;
@@ -47,8 +48,12 @@ public class CoversServiceTests
     public async Task CreateCover_StartDateInPast_RequestInvalid()
     {
         CreateCoverRequest request = new(Today.AddDays(-1), Today.AddMonths(3), CoverType.Yacht);
-        
-        IEnumerable<ValidationResult> errors = request.Validate(new ValidationContext(request));
+
+        IClock clock = new FakeClock(Today);
+        ValidationContext context = new(request);
+        context.InitializeServiceProvider(t => t == typeof(IClock) ? clock : null);
+
+        IEnumerable<ValidationResult> errors = request.Validate(context);
 
         Assert.Single(errors);
         Assert.Equal(ValidationErrors.START_DATE_IN_PAST, errors.First().ErrorMessage);
@@ -59,7 +64,11 @@ public class CoversServiceTests
     {
         CreateCoverRequest request = new(Today, Today.AddYears(1).AddDays(1), CoverType.Yacht);
 
-        IEnumerable<ValidationResult> errors = request.Validate(new ValidationContext(request));
+        IClock clock = new FakeClock(Today);
+        ValidationContext context = new(request);
+        context.InitializeServiceProvider(t => t == typeof(IClock) ? clock : null);
+
+        IEnumerable<ValidationResult> errors = request.Validate(context);
 
         Assert.Single(errors);
         Assert.Equal(ValidationErrors.END_DATE_TOO_FAR, errors.First().ErrorMessage);
@@ -87,7 +96,11 @@ public class CoversServiceTests
     {
         CreateCoverRequest request = new(Today, Today.AddDays(-1), CoverType.Yacht);
 
-        IEnumerable<ValidationResult> errors = request.Validate(new ValidationContext(request));
+        IClock clock = new FakeClock(Today);
+        ValidationContext context = new(request);
+        context.InitializeServiceProvider(t => t == typeof(IClock) ? clock : null);
+
+        IEnumerable<ValidationResult> errors = request.Validate(context);
 
         Assert.Single(errors);
         Assert.Equal(ValidationErrors.END_DATE_BEFORE_START_DATE, errors.First().ErrorMessage);
@@ -247,4 +260,9 @@ public class CoversServiceTests
         Assert.Equal(ResultType.Invalid, result.ResultType);
         Assert.Equal(ResultCodes.END_DATE_BEFORE_START_DATE, result.Message);
     }
+}
+
+public class FakeClock(DateTime utcNow) : IClock
+{
+    public DateTime UtcNow => utcNow;
 }

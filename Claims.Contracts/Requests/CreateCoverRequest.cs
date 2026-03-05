@@ -1,6 +1,9 @@
 ﻿using Claims.Contracts.Validation;
+using Claims.Core.Clock;
 using Claims.Domain;
+using Microsoft.Extensions.Internal;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 
 namespace Claims.Contracts.Requests
 {
@@ -23,7 +26,10 @@ namespace Claims.Contracts.Requests
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (StartDate.Date < DateTime.UtcNow.Date)
+            IClock clock = validationContext.GetService(typeof(IClock)) as IClock
+                ?? new Core.Clock.SystemClock();
+
+            if (StartDate.Date < clock.UtcNow.Date)
             {
                 return [new ValidationResult(ValidationErrors.START_DATE_IN_PAST, [nameof(StartDate)])];
             }
